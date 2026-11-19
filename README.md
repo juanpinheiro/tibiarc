@@ -43,6 +43,9 @@ build/apps/render/tibiarc-render --size 800 600 --start 30000 \
 | [WebAssembly interface](docs/wasm-api.md) | Embedding the player in another page |
 | [Testing](docs/testing.md) | Running and extending the tests |
 
+
+<img width="1919" height="945" alt="image" src="https://github.com/user-attachments/assets/5a63a870-319c-4224-88b1-7531ab891047" />
+
 ## Credits
 
 tibiarc was written at Tibiacast and released as open source by
