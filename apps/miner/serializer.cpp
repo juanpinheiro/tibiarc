@@ -269,6 +269,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
          {Type::CreatureHealthUpdated, "CreatureHealthUpdated"},
          {Type::CreatureImpassableUpdated, "CreatureImpassableUpdated"},
          {Type::CreatureLightUpdated, "CreatureLightUpdated"},
+         {Type::CreatureMarked, "CreatureMarked"},
          {Type::CreatureMoved, "CreatureMoved"},
          {Type::CreatureNPCCategoryUpdated, "CreatureNPCCategoryUpdated"},
          {Type::CreatureOutfitUpdated, "CreatureOutfitUpdated"},
@@ -393,6 +394,11 @@ static json ToJSON(const Version &version, const CreatureSeen &event) {
     }
 
     return result;
+}
+
+static json ToJSON([[maybe_unused]] const Version &version,
+                   const CreatureMarked &event) {
+    return json{{"CreatureId", event.CreatureId}, {"Color", event.Color}};
 }
 
 static json ToJSON([[maybe_unused]] const Version &version,
@@ -844,6 +850,10 @@ static json ToJSON(const Version &version, const Events::Base &base) {
         break;
     case Events::Type::CreatureSeen:
         j = ToJSON(version, static_cast<const Events::CreatureSeen &>(base));
+        break;
+    case Events::Type::CreatureMarked:
+        j = ToJSON(version,
+                   static_cast<const Events::CreatureMarked &>(base));
         break;
     case Events::Type::CreatureHealthUpdated:
         j = ToJSON(version,

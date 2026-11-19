@@ -51,35 +51,39 @@ Pixel OutfitColorizer::PaletteColor(int index) {
         value = Values[row];
     }
 
+    /* The conversion is spelled out the way the client computes it, as
+     * the results are truncated and a differently ordered formula can end
+     * up one step off. */
     double red = value, green = value, blue = value;
 
-    if (saturation > 0.0) {
-        const double sector = (hue >= 1.0 ? 0.0 : hue) * 6.0;
-        const int which = static_cast<int>(std::floor(sector));
-        const double fraction = sector - which;
-        const double p = value * (1.0 - saturation);
-        const double q = value * (1.0 - saturation * fraction);
-        const double t = value * (1.0 - saturation * (1.0 - fraction));
+    if (saturation != 0.0) {
+        const double low = (1.0 - saturation) * value;
+        const double span = value - low;
 
-        switch (which) {
-        case 0:
-            red = value, green = t, blue = p;
-            break;
-        case 1:
-            red = q, green = value, blue = p;
-            break;
-        case 2:
-            red = p, green = value, blue = t;
-            break;
-        case 3:
-            red = p, green = q, blue = value;
-            break;
-        case 4:
-            red = t, green = p, blue = value;
-            break;
-        default:
-            red = value, green = p, blue = q;
-            break;
+        if (hue < 1.0 / 6.0) {
+            red = value;
+            blue = low;
+            green = span * hue * 6.0 + low;
+        } else if (hue < 1.0 / 3.0) {
+            green = value;
+            blue = low;
+            red = value - (hue - 1.0 / 6.0) * span * 6.0;
+        } else if (hue < 0.5) {
+            green = value;
+            red = low;
+            blue = span * (hue - 1.0 / 3.0) * 6.0 + low;
+        } else if (hue < 2.0 / 3.0) {
+            blue = value;
+            red = low;
+            green = value - span * (hue - 0.5) * 6.0;
+        } else if (hue < 5.0 / 6.0) {
+            blue = value;
+            green = low;
+            red = span * (hue - 2.0 / 3.0) * 6.0 + low;
+        } else {
+            red = value;
+            green = low;
+            blue = value - span * (hue - 5.0 / 6.0) * 6.0;
         }
     }
 

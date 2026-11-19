@@ -676,10 +676,17 @@ struct MapRenderer::Pass {
         const Creature &creature = *standing.Who;
         const int left = standing.DX + x, top = standing.DY + y;
 
-        if (creature.SquareEndTick >= Now && creature.SquareColor != 0) {
-            const Pixel color = Pixel::ProtocolColor(creature.SquareColor);
+        if (creature.SquareEndTick != 0 && creature.SquareEndTick >= Now) {
+            /* Coloured marks are drawn a little inside the field so they
+             * stay apart from the black one. */
+            const int inset = creature.SquareColor == 0 ? 0 : 2;
 
-            Target.Frame(Rect{left, top, 32, 32}, 2, color);
+            Target.Frame(Rect{left + inset,
+                              top + inset,
+                              32 - inset * 2,
+                              32 - inset * 2},
+                         2,
+                         Pixel::ProtocolColor(creature.SquareColor));
         }
 
         if (creature.Outfit.Id == 0) {

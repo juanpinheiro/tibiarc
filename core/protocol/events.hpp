@@ -42,6 +42,7 @@ enum class Type {
     CreatureHealthUpdated,
     CreatureImpassableUpdated,
     CreatureLightUpdated,
+    CreatureMarked,
     CreatureMoved,
     CreatureNPCCategoryUpdated,
     CreatureOutfitUpdated,
@@ -222,6 +223,18 @@ struct CreatureHealthUpdated : public Base {
     virtual void Update(Gamestate &gamestate) const;
     virtual Events::Type Kind() const {
         return Events::Type::CreatureHealthUpdated;
+    }
+};
+
+/* The server points a creature out, which the client shows as a coloured
+ * square around it for a moment. */
+struct CreatureMarked : public Base {
+    uint32_t CreatureId;
+    uint8_t Color;
+
+    virtual void Update(Gamestate &gamestate) const;
+    virtual Events::Type Kind() const {
+        return Events::Type::CreatureMarked;
     }
 };
 

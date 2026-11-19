@@ -226,6 +226,15 @@ void CreatureHealthUpdated::Update(Gamestate &gamestate) const {
     creature.Health = std::max<uint8_t>(0, std::min<uint8_t>(Health, 100));
 }
 
+void CreatureMarked::Update(Gamestate &gamestate) const {
+    static constexpr uint32_t Duration = 1000;
+
+    if (auto *creature = gamestate.FindCreature(CreatureId)) {
+        creature->SquareColor = Color;
+        creature->SquareEndTick = gamestate.CurrentTick + Duration;
+    }
+}
+
 void CreatureHeadingUpdated::Update(Gamestate &gamestate) const {
     auto &creature = gamestate.GetCreature(CreatureId);
 

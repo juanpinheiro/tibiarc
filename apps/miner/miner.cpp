@@ -32,9 +32,12 @@ int main(int argc, char **argv) {
             .InputFormat = Recordings::Format::Unknown,
             .InputRecovery = Recordings::Recovery::None,
 
+            .SkippedEvents = {},
+
             .StartTime = std::chrono::milliseconds::zero(),
             .EndTime = std::chrono::milliseconds::max(),
 
+            .DesiredTibiaVersion = {},
             .DryRun = false};
 
     auto paths = CLI::Process(
@@ -50,7 +53,7 @@ int main(int argc, char **argv) {
                       "start",
                       {"end_ms"},
                       [&](const CLI::Range &args) {
-                          uint32_t time;
+                          int32_t time;
                           if (sscanf(args[0].c_str(), "%i", &time) != 1 ||
                               time < 0) {
                               throw "end-time must be a time in milliseconds";
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
                       "to start",
                       {"start_ms"},
                       [&](const CLI::Range &args) {
-                          uint32_t time;
+                          int32_t time;
                           if (sscanf(args[0].c_str(), "%i", &time) != 1 ||
                               time < 0) {
                               throw "start-time must be a time in milliseconds";

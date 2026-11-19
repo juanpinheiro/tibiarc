@@ -845,11 +845,16 @@ void Parser::ParseTextEffect(DataReader &reader, EventList &events) {
     ParseAssert(sscanf(message.c_str(), "%u", &event.Value) == 1);
 }
 
-void Parser::ParseMarkCreature(DataReader &reader,
-                               [[maybe_unused]] EventList &events) {
-    /* creature id, color */
-    reader.SkipU32();
-    reader.SkipU8();
+void Parser::ParseMarkCreature(DataReader &reader, EventList &events) {
+    auto creatureId = reader.ReadU32();
+    auto color = reader.ReadU8();
+
+    if (KnownCreatures_.contains(creatureId)) {
+        auto &event = AddEvent<CreatureMarked>(events);
+
+        event.CreatureId = creatureId;
+        event.Color = color;
+    }
 }
 
 void Parser::ParseTrappers(DataReader &reader,
