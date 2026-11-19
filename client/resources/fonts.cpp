@@ -17,7 +17,7 @@
  * along with tibiarc. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "assets/fonts.hpp"
+#include "resources/fonts.hpp"
 
 namespace trc {
 namespace Client {

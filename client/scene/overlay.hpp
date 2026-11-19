@@ -20,8 +20,8 @@
 #ifndef __TRC_CLIENT_SCENE_OVERLAY_HPP__
 #define __TRC_CLIENT_SCENE_OVERLAY_HPP__
 
-#include "assets/fonts.hpp"
-#include "assets/skin.hpp"
+#include "resources/fonts.hpp"
+#include "resources/skin.hpp"
 #include "game/gamestate.hpp"
 #include "scene/mapview.hpp"
 #include "world/options.hpp"

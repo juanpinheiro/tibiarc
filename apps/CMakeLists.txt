@@ -24,6 +24,7 @@
 add_library(tibiarc_apps_shared STATIC
   "shared/collation.cpp"
   "shared/memoryfile.cpp"
+  "shared/png.cpp"
 )
 target_include_directories(tibiarc_apps_shared PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(tibiarc_apps_shared
@@ -32,3 +33,4 @@ target_link_libraries(tibiarc_apps_shared
 
 add_subdirectory(collator)
 add_subdirectory(miner)
+add_subdirectory(render)

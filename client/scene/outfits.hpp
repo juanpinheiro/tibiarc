@@ -20,6 +20,7 @@
 #ifndef __TRC_CLIENT_SCENE_OUTFITS_HPP__
 #define __TRC_CLIENT_SCENE_OUTFITS_HPP__
 
+#include "common/pixel.hpp"
 #include "game/creature.hpp"
 #include "graphics/sprites.hpp"
 

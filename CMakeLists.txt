@@ -43,6 +43,7 @@ include(cmake/TibiarcOptions.cmake)
 
 add_subdirectory(third_party)
 add_subdirectory(core)
+add_subdirectory(client)
 
 if(EMSCRIPTEN)
   add_subdirectory(platform/wasm)

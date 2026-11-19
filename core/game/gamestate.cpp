@@ -46,6 +46,9 @@ void Gamestate::Reset() {
     Creatures.clear();
     Map.Clear();
     Map.Light = {};
+    Player = {};
+    MissileIndex = 0;
+    EffectSequence = 0;
 }
 
 Gamestate::Gamestate(const trc::Version &version) : Version(version) {
