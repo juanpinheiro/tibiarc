@@ -3,7 +3,7 @@
 **Old Tibia recordings, played back exactly as the game client showed them —
 in your browser, at any size, with nothing to install.**
 
-<img width="1919" height="945" alt="A Tibia 7.4 recording playing in the browser, with the client's console, inventory, backpack, skills and battle list" src="https://github.com/user-attachments/assets/5a63a870-319c-4224-88b1-7531ab891047" />
+<img width="1319" height="740" alt="image" src="https://github.com/user-attachments/assets/a298151a-0d39-4612-b135-8a9194ded8d5" />
 
 Drop a `.rec`, `.cam` or any other supported recording on the page and you
 are back in the client of the time: the game window, the console with its
