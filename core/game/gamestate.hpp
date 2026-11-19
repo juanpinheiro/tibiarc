@@ -48,7 +48,6 @@ struct Gamestate {
 
     std::unordered_map<uint32_t, Container> Containers;
     std::unordered_map<uint32_t, Creature> Creatures;
-    MessageList Messages;
 
     /* FIXME: C++ migration. */
     unsigned MissileIndex = 0;
@@ -57,6 +56,9 @@ struct Gamestate {
     trc::Map Map;
 
     uint32_t CurrentTick = 0;
+
+    /* Increases with every effect added, see GraphicalEffect::Sequence. */
+    uint32_t EffectSequence = 0;
 
     Gamestate(const trc::Version &version);
 
@@ -69,10 +71,6 @@ struct Gamestate {
     void AddMissileEffect(const Position &origin,
                           const Position &target,
                           uint8_t missileId);
-    void AddTextMessage(MessageMode messageType,
-                        const std::string &message,
-                        const std::string &author = std::string(),
-                        const Position &position = Position());
 
     void Reset();
 };

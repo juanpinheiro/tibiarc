@@ -21,16 +21,8 @@
 #ifndef __TRC_MESSAGE_HPP__
 #define __TRC_MESSAGE_HPP__
 
-#include <algorithm>
 #include <cstdint>
-#include <utility>
-#include <string>
-#include <list>
 
-#include "common/pixel.hpp"
-#include "common/position.hpp"
-
-static constexpr uint32_t MESSAGE_DISPLAY_TIME = 3000;
 
 namespace trc {
 /* Priority-ordered canonical message modes, lower values have higher display
@@ -108,81 +100,6 @@ enum class MessageMode {
     RuleViolationChannel,
     RuleViolationAnswer,
     RuleViolationContinue,
-};
-
-class MessageList;
-struct Message {
-    friend MessageList;
-
-    MessageMode Type;
-    trc::Position Position;
-    std::string Author;
-    std::string Text;
-
-    Message(MessageMode type,
-            const trc::Position &position,
-            const std::string &author,
-            const std::string &text,
-            uint32_t endTick)
-        : Type(type),
-          Position(position),
-          Author(author),
-          Text(text),
-          EndTick(endTick) {
-    }
-
-    Message() {
-    }
-
-    static Pixel TextColor(MessageMode type);
-
-private:
-    uint32_t EndTick;
-};
-
-class MessageList {
-    std::list<Message> Messages;
-
-    static std::strong_ordering CompareTypes(MessageMode messageType,
-                                             MessageMode compareType);
-    static std::strong_ordering SortFunction(MessageMode type,
-                                             const Position &position,
-                                             const std::string &author,
-                                             const Message &compareTo);
-
-public:
-    using Iterator = std::list<Message>::const_iterator;
-
-    MessageList() {
-    }
-
-    void AddMessage(MessageMode type,
-                    const trc::Position &position,
-                    const std::string &author,
-                    const std::string &text,
-                    uint32_t tick);
-
-    void Prune(uint32_t tick) {
-        /* FIXME: This is naive until the C++ migration is complete,
-         * performance is not important at the moment. */
-        std::erase_if(Messages, [tick](const auto &message) {
-            return message.EndTick < tick;
-        });
-    }
-
-    void Clear() {
-        Messages.clear();
-    }
-
-    Iterator begin() const {
-        return Messages.cbegin();
-    }
-
-    Iterator end() const {
-        return Messages.cend();
-    }
-
-    std::pair<bool, bool> QueryNext(Iterator current) const;
 };
 
 } // namespace trc

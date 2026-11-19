@@ -40,34 +40,29 @@ void Tile::Clear() {
     NumericalEffects = {};
 }
 
-void Tile::AddGraphicalEffect(uint8_t effectId, uint32_t currentTick) {
+void Tile::AddGraphicalEffect(uint8_t effectId,
+                              uint32_t currentTick,
+                              uint32_t sequence) {
     auto &effect = GraphicalEffects[GraphicalIndex];
 
     effect.StartTick = currentTick;
     effect.Id = effectId;
+    effect.Sequence = sequence;
 
     GraphicalIndex = (GraphicalIndex + 1) % Tile::MaxEffects;
 }
 
 void Tile::AddNumericalEffect(uint8_t color,
                               uint32_t value,
-                              uint32_t currentTick) {
-    /* Merge effects that happen at roughly the same time. */
-    for (int effectIdx = 0; effectIdx < Tile::MaxEffects; effectIdx++) {
-        auto &effect = NumericalEffects[effectIdx];
-
-        if ((effect.StartTick + 200) > currentTick && effect.Color == color) {
-            effect.StartTick = currentTick;
-            effect.Value += value;
-
-            return;
-        }
-    }
-
+                              uint32_t currentTick,
+                              uint32_t sequence) {
     auto &effect = NumericalEffects[NumericalIndex];
+
     effect.StartTick = currentTick;
     effect.Color = color;
     effect.Value = value;
+    effect.Active = true;
+    effect.Sequence = sequence;
 
     NumericalIndex = (NumericalIndex + 1) % Tile::MaxEffects;
 }

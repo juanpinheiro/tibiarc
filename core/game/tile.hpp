@@ -42,11 +42,14 @@ struct Tile {
     std::array<GraphicalEffect, MaxEffects> GraphicalEffects;
     std::array<Object, MaxObjects> Objects;
 
-    void AddGraphicalEffect(uint8_t effectId, uint32_t currentTick);
+    void AddGraphicalEffect(uint8_t effectId,
+                            uint32_t currentTick,
+                            uint32_t sequence);
 
     void AddNumericalEffect(uint8_t color,
                             uint32_t value,
-                            uint32_t currentTick);
+                            uint32_t currentTick,
+                            uint32_t sequence);
 
     void InsertObject(const Version &version,
                       const Object &object,

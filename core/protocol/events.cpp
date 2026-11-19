@@ -41,8 +41,7 @@ void WorldInitialized::Update(Gamestate &gamestate) const {
 }
 
 void AmbientLightChanged::Update(Gamestate &gamestate) const {
-    gamestate.Map.LightIntensity = Intensity;
-    gamestate.Map.LightColor = Color;
+    gamestate.Map.Light.Set(Intensity, Color, gamestate.CurrentTick);
 }
 
 void PlayerMoved::Update(Gamestate &gamestate) const {
@@ -104,30 +103,29 @@ void CreatureMoved::Update(Gamestate &gamestate) const {
     auto &toTile = gamestate.Map.Tile(To);
     auto &creature = gamestate.GetCreature(creatureId);
 
-    creature.MovementInformation.Origin = From;
-    creature.MovementInformation.Target = To;
+    xDifference = To.X - From.X;
+    yDifference = To.Y - From.Y;
+    zDifference = To.Z - From.Z;
 
-    xDifference = creature.MovementInformation.Target.X -
-                  creature.MovementInformation.Origin.X;
-    yDifference = creature.MovementInformation.Target.Y -
-                  creature.MovementInformation.Origin.Y;
-    zDifference = creature.MovementInformation.Target.Z -
-                  creature.MovementInformation.Origin.Z;
-
-    if (yDifference < 0) {
+    if (xDifference > 0) {
+        creature.Heading = Creature::Direction::East;
+    } else if (xDifference < 0) {
+        creature.Heading = Creature::Direction::West;
+    } else if (yDifference < 0) {
         creature.Heading = Creature::Direction::North;
     } else if (yDifference > 0) {
         creature.Heading = Creature::Direction::South;
     }
 
-    if (xDifference < 0) {
-        creature.Heading = Creature::Direction::West;
-    } else if (xDifference > 0) {
-        creature.Heading = Creature::Direction::East;
-    }
+    auto &walk = creature.Walk;
 
-    /* Set appropriate start/end ticks for this movement. Note that moves
-     * between floors as well as teleportations are instant.
+    walk = {};
+    walk.StartTick = gamestate.CurrentTick;
+    walk.EndTick = gamestate.CurrentTick;
+    walk.SettleTick = gamestate.CurrentTick;
+    walk.Heading = creature.Heading;
+
+    /* Moves between floors and teleportations are instant.
      *
      * Strangely, moving onto an empty tile is okay and counts as a
      * teleportation. */
@@ -154,16 +152,31 @@ void CreatureMoved::Update(Gamestate &gamestate) const {
                 movementSpeed = 1;
             }
         } else {
-            movementSpeed = std::max<int>(1, creature.Speed);
+            movementSpeed = std::max<int>(0, creature.Speed);
         }
 
-        creature.MovementInformation.WalkEndTick =
-                gamestate.CurrentTick +
-                (groundType.Properties.Speed * 1000) / movementSpeed;
-        creature.MovementInformation.WalkStartTick = gamestate.CurrentTick;
-    } else {
-        creature.MovementInformation.WalkStartTick = 0;
-        creature.MovementInformation.WalkEndTick = 0;
+        /* A step takes as long as the ground allows, rounded up to whole
+         * server beats. Diagonal steps arrive just as fast but keep the
+         * creature in its walking pose for three times as long. */
+        const uint32_t beat = std::max<uint32_t>(1, gamestate.Player.BeatDuration);
+        const uint32_t groundSpeed = groundType.Properties.Speed;
+        uint32_t duration =
+                movementSpeed > 0 ? (groundSpeed * 1000) / movementSpeed : 1000;
+        uint32_t settle = duration;
+
+        duration = ((beat - 1 + duration) / beat) * beat;
+
+        if (xDifference != 0 && yDifference != 0) {
+            settle = movementSpeed > 0 ? (groundSpeed * 3000) / movementSpeed
+                                       : 1000;
+        } else {
+            settle = duration;
+        }
+
+        walk.DeltaX = static_cast<int8_t>(xDifference);
+        walk.DeltaY = static_cast<int8_t>(yDifference);
+        walk.EndTick = walk.StartTick + duration;
+        walk.SettleTick = walk.StartTick + settle;
     }
 
     Object movedObject;
@@ -185,8 +198,7 @@ void CreatureSeen::Update(Gamestate &gamestate) const {
             gamestate.Creatures.try_emplace(CreatureId);
     auto &creature = it->second;
 
-    /* FIXME: C++ migration, zero-init. */
-    creature.MovementInformation = {};
+    creature.Walk = {};
 
     creature.Id = CreatureId;
     creature.Type = Type;
@@ -356,12 +368,12 @@ void PvPSituationsChanged::Update(Gamestate &gamestate) const {
     gamestate.Player.OpenPvPSituations = OpenSituations;
 }
 
-void CreatureSpoke::Update(Gamestate &gamestate) const {
-    gamestate.AddTextMessage(Mode, Message, AuthorName);
+/* Speech and status messages do not alter the game state proper: how they
+ * are presented, and for how long, is entirely up to the client. */
+void CreatureSpoke::Update([[maybe_unused]] Gamestate &gamestate) const {
 }
 
-void CreatureSpokeOnMap::Update(Gamestate &gamestate) const {
-    gamestate.AddTextMessage(Mode, Message, AuthorName, Position);
+void CreatureSpokeOnMap::Update([[maybe_unused]] Gamestate &gamestate) const {
 }
 
 void CreatureSpokeInChannel::Update(
@@ -478,35 +490,26 @@ void NPCTradePlayerGoods::Update([[maybe_unused]] Gamestate &gamestate) const {
 void NumberEffectPopped::Update(Gamestate &gamestate) const {
     auto &tile = gamestate.Map.Tile(Position);
 
-    tile.AddNumericalEffect(Color, Value, gamestate.CurrentTick);
+    tile.AddNumericalEffect(Color,
+                            Value,
+                            gamestate.CurrentTick,
+                            gamestate.EffectSequence++);
 }
 
 void GraphicalEffectPopped::Update(Gamestate &gamestate) const {
     auto &tile = gamestate.Map.Tile(Position);
 
-    tile.AddGraphicalEffect(Id, gamestate.CurrentTick);
+    tile.AddGraphicalEffect(Id,
+                            gamestate.CurrentTick,
+                            gamestate.EffectSequence++);
 }
 
 void MissileFired::Update(Gamestate &gamestate) const {
     gamestate.AddMissileEffect(Origin, Target, Id);
 }
 
-void StatusMessageReceived::Update(Gamestate &gamestate) const {
-    switch (Mode) {
-    case MessageMode::DamageDealt:
-    case MessageMode::DamageReceived:
-    case MessageMode::DamageReceivedOthers:
-    case MessageMode::Healing:
-    case MessageMode::HealingOthers:
-    case MessageMode::Experience:
-    case MessageMode::ExperienceOthers:
-    case MessageMode::Mana:
-        /* These are not shown in the viewport. */
-        break;
-    default:
-        gamestate.AddTextMessage(Mode, Message);
-        break;
-    }
+void StatusMessageReceived::Update(
+        [[maybe_unused]] Gamestate &gamestate) const {
 }
 
 void StatusMessageReceivedInChannel::Update(

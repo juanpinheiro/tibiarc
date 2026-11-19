@@ -27,12 +27,16 @@ namespace trc {
 struct GraphicalEffect {
     uint8_t Id = 0;
     uint32_t StartTick = 0;
+    /* Monotonic counter used to order effects newest-first. */
+    uint32_t Sequence = 0;
 };
 
 struct NumericalEffect {
     uint32_t StartTick = 0;
     uint8_t Color = 0;
     uint32_t Value = 0;
+    bool Active = false;
+    uint32_t Sequence = 0;
 };
 } // namespace trc
 

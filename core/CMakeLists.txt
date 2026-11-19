@@ -29,7 +29,6 @@ add_library(tibiarc_core STATIC
   "common/characterset.cpp"
   "common/crypto.cpp"
   "game/gamestate.cpp"
-  "game/message.cpp"
   "game/tile.cpp"
   "graphics/canvas.cpp"
   "graphics/sprites.cpp"

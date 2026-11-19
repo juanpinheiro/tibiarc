@@ -174,18 +174,34 @@ struct Appearance {
 };
 
 struct Creature {
-    struct {
-        uint32_t WalkStartTick;
-        uint32_t WalkEndTick;
+    enum class Direction : uint8_t {
+        North = 0,
+        East = 1,
+        South = 2,
+        West = 3,
+    
+        First = North,
+        Last = West,
+    };
 
-        Position Origin;
-        Position Target;
+    /* The step a creature is currently taking, mirroring what the game
+     * client tracks: the offset from its field shrinks from a full field to
+     * nothing between `StartTick` and `EndTick`. */
+    struct Step {
+        uint32_t StartTick = 0;
+        /* When the creature arrives; rounded up to whole server beats. */
+        uint32_t EndTick = 0;
+        /* When the creature stops being considered walking, which is later
+         * than `EndTick` for diagonal steps. */
+        uint32_t SettleTick = 0;
 
-        /* FIXME: C++ migration, handle this entirely in the renderer. */
-        uint32_t LastUpdateTick;
-        int WalkOffsetX;
-        int WalkOffsetY;
-    } MovementInformation;
+        int8_t DeltaX = 0;
+        int8_t DeltaY = 0;
+
+        Direction Heading = Direction::South;
+    };
+
+    Step Walk;
 
     uint32_t Id;
 
@@ -196,17 +212,13 @@ struct Creature {
     uint8_t MarkIsPermanent;
     uint8_t Mark;
 
+    /* Coloured square flashed around the creature, e.g. when it attacks. */
+    uint8_t SquareColor = 0;
+    uint32_t SquareEndTick = 0;
+
     uint8_t Health;
 
-    enum class Direction : uint8_t {
-        North = 0,
-        East = 1,
-        South = 2,
-        West = 3,
-
-        First = North,
-        Last = West,
-    } Heading;
+    Direction Heading;
 
     uint8_t LightIntensity;
     uint8_t LightColor;

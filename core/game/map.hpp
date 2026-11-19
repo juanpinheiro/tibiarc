@@ -21,6 +21,8 @@
 #ifndef __TRC_MAP_HPP__
 #define __TRC_MAP_HPP__
 
+#include <algorithm>
+#include <array>
 #include <cstdint>
 
 #include "game/effect.hpp"
@@ -34,11 +36,47 @@ struct Map {
     static constexpr int TileBufferWidth = 18;
     static constexpr int TileBufferHeight = 14;
     static constexpr int TileBufferDepth = 8;
-    static constexpr int RenderHeightMapSize =
-            (TileBufferWidth + 2) * (TileBufferHeight + 2);
 
-    uint8_t LightIntensity;
-    uint8_t LightColor;
+    /* Ambient light does not change at once: the client moves its level
+     * and each colour channel one step towards the target every second. */
+    struct AmbientLight {
+        static constexpr uint32_t StepInterval = 1000;
+
+        struct Value {
+            int Level = 0;
+            int Red = 0, Green = 0, Blue = 0;
+        };
+
+        Value From, Target;
+        uint32_t ChangeTick = 0;
+        bool Known = false;
+
+        void Set(uint8_t level, uint8_t color, uint32_t tick) {
+            const Value target{level,
+                               (color / 36) * 51,
+                               ((color / 6) % 6) * 51,
+                               (color % 6) * 51};
+
+            From = Known ? At(tick) : target;
+            Target = target;
+            ChangeTick = tick;
+            Known = true;
+        }
+
+        Value At(uint32_t tick) const {
+            const int steps = static_cast<int>((tick / StepInterval) -
+                                               (ChangeTick / StepInterval));
+            auto approach = [steps](int from, int target) {
+                return (from < target) ? std::min(target, from + steps)
+                                       : std::max(target, from - steps);
+            };
+
+            return Value{approach(From.Level, Target.Level),
+                         approach(From.Red, Target.Red),
+                         approach(From.Green, Target.Green),
+                         approach(From.Blue, Target.Blue)};
+        }
+    } Light;
 
     trc::Position Position;
 
@@ -70,26 +108,6 @@ struct Map {
         return Tiles[X + (Y + (Z * TileBufferHeight)) * TileBufferWidth];
     }
 
-    uint8_t GetRenderHeight(int rX, int bY) const {
-        if (rX > 0 && bY > 0) {
-            Assert((rX / 32) + ((bY / 32) * TileBufferWidth) <=
-                   RenderHeightMapSize);
-
-            return RenderHeightMap[(rX / 32) + ((bY / 32) * TileBufferWidth)];
-        }
-
-        return std::numeric_limits<uint8_t>::max();
-    }
-
-    void UpdateRenderHeight(int rX, int bY, uint8_t Z) {
-        if (rX > 0 && bY > 0) {
-            Assert((rX / 32) + ((bY / 32) * TileBufferWidth) <=
-                   RenderHeightMapSize);
-
-            RenderHeightMap[(rX / 32) + ((bY / 32) * TileBufferWidth)] = Z;
-        }
-    }
-
     void Clear() {
         for (auto &tile : Tiles) {
             tile.Clear();
@@ -99,7 +117,6 @@ struct Map {
 private:
     std::array<trc::Tile, TileBufferWidth * TileBufferHeight * TileBufferDepth>
             Tiles;
-    std::array<uint8_t, RenderHeightMapSize> RenderHeightMap;
 };
 } // namespace trc
 

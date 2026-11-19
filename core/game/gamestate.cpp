@@ -39,20 +39,13 @@ void Gamestate::AddMissileEffect(const trc::Position &origin,
     missile.Target = target;
 }
 
-void Gamestate::AddTextMessage(MessageMode type,
-                               const std::string &message,
-                               const std::string &author,
-                               const Position &position) {
-    Messages.AddMessage(type, position, author, message, CurrentTick);
-}
-
 void Gamestate::Reset() {
     memset((void *)&MissileList, 0, sizeof(MissileList));
 
     Containers.clear();
     Creatures.clear();
-    Messages.Clear();
     Map.Clear();
+    Map.Light = {};
 }
 
 Gamestate::Gamestate(const trc::Version &version) : Version(version) {

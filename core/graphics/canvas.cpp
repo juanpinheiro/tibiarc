@@ -176,10 +176,14 @@ void Canvas::DrawGlyph(const Sprite &glyph,
                     Pixel *target = &GetPixel(targetX, targetY);
 
                     for (int i = 0; i < count; i++) {
-                        target[i].Red = (pixels[i].Red * color.Red) / 255;
-                        target[i].Green =
-                                (pixels[i].Green * color.Green) / 255;
-                        target[i].Blue = (pixels[i].Blue * color.Blue) / 255;
+                        const int grey = (pixels[i].Red * 30 +
+                                          pixels[i].Green * 59 +
+                                          pixels[i].Blue * 11) /
+                                         100;
+
+                        target[i].Red = (color.Red * grey) / 256;
+                        target[i].Green = (color.Green * grey) / 256;
+                        target[i].Blue = (color.Blue * grey) / 256;
                         target[i].Alpha = 0xFF;
                     }
                 });
