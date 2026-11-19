@@ -31,7 +31,7 @@ into mush. tibiarc does what the client did:
 
 | | |
 | --- | --- |
-| **Plays in the browser** | A 300 KB WebAssembly module and a page with no dependencies. Nothing is uploaded; your files never leave your machine. |
+| **Plays in the browser** | A WebAssembly module of about 330 KB and a page with no dependencies. Nothing is uploaded; your files never leave your machine. |
 | **The whole client window** | Game view, console with channel tabs and private conversations, automap, health and mana, inventory, containers, skills, battle list, VIP list. |
 | **It reacts** | Switch console tabs, open and close Skills, Battle and VIP, close windows, scroll backpacks and chat history with the wheel or the scrollbars, drag the bar between map and console. |
 | **Seek anywhere** | Jump to any moment of a 45-minute hunt instantly; speeds from ¼× to 64×. |
