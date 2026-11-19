@@ -119,6 +119,25 @@ bool Viewer::Click(int x, int y) {
     case Gesture::SelectChannel:
         Console.SelectChannel(Playback.Surroundings().Console, spot->Target);
         break;
+    case Gesture::ScrollWindow:
+    case Gesture::ScrollConsole:
+        break;
+    }
+
+    return true;
+}
+
+bool Viewer::Scroll(int x, int y, int notches) {
+    const auto spot = Spots.WheelAt(x, y);
+
+    if (!spot) {
+        return false;
+    }
+
+    if (spot->What == Gesture::ScrollWindow) {
+        Side.ScrollWindow(spot->Target, notches);
+    } else if (spot->What == Gesture::ScrollConsole) {
+        Console.Scroll(Playback.Surroundings().Console, notches);
     }
 
     return true;

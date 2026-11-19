@@ -27,6 +27,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace trc {
@@ -43,25 +44,38 @@ public:
         uint32_t Target = 0;
     };
 
+    /* How far down the list of each window starts, in pixels, by the key
+     * the window was opened with. */
+    using ScrollPositions = std::unordered_map<uint32_t, int>;
+
     explicit WindowStack(int height) : Height(height) {
     }
 
     /* Opens a window at the bottom the way the client does. If there isn't
      * room for it the windows above are made smaller, starting with the
      * lowest, and those that cannot shrink enough are closed. */
-    void Open(std::unique_ptr<ContentWindow> window, const Closing &closing);
+    void Open(std::unique_ptr<ContentWindow> window,
+              const Closing &closing,
+              uint32_t key);
 
     /* Opens a window at the bottom if that takes nothing away from the
      * windows opened with `Open`: only others opened this way shrink for
      * it, and none is closed. Returns whether it was opened. */
     bool OpenIfRoom(std::unique_ptr<ContentWindow> window,
-                    const Closing &closing);
+                    const Closing &closing,
+                    uint32_t key);
+
+    /* How far a notch of the wheel moves the list of a window, or zero if
+     * no window with that key is open. */
+    int ScrollStep(uint32_t key) const;
 
     /* Draws the column with its top-left corner at (x, y), noting where
-     * its windows can be closed. */
+     * its windows can be closed and scrolled. Positions that reach past
+     * the end of a list are brought back within it. */
     void Draw(Canvas &canvas,
               Widgets &widgets,
               Hotspots &hotspots,
+              ScrollPositions &scrolls,
               int x,
               int y,
               uint32_t now) const;
@@ -70,6 +84,7 @@ private:
     struct Entry {
         std::unique_ptr<ContentWindow> Window;
         Closing Close;
+        uint32_t Key;
         /* Height of the whole window. */
         int Height;
         /* Opened only because there was room. */
@@ -87,6 +102,7 @@ private:
 
     void Place(std::unique_ptr<ContentWindow> window,
                const Closing &closing,
+               uint32_t key,
                bool optional);
 
     void DrawFreeArea(Canvas &canvas,

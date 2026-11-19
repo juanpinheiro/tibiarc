@@ -80,6 +80,11 @@ public:
      * console. Returns whether anything was there to press. */
     bool Click(int x, int y);
 
+    /* Turns the wheel over a point of the window as last painted, by
+     * notches, down for positive ones: moves the lists of the sidebar and
+     * the text of the console. Returns whether anything there moves. */
+    bool Scroll(int x, int y, int notches);
+
     Session Playback;
 
 private:

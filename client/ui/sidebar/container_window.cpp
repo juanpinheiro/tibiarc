@@ -79,6 +79,11 @@ int ContainerWindow::ContentHeight() const {
     return GridHeight(Contents.SlotsPerPage);
 }
 
+/* The wheel moves the cells a row at a time. */
+int ContainerWindow::ScrollStep() const {
+    return CellPitch;
+}
+
 void ContainerWindow::DrawList(Canvas &canvas,
                                Widgets &widgets,
                                const Rect &area,

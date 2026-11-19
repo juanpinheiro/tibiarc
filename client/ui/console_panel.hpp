@@ -54,6 +54,10 @@ public:
         Focus.Select(log, place);
     }
 
+    /* Moves the text of the channel in front by notches of the wheel,
+     * towards newer lines for positive ones. */
+    void Scroll(const ConsoleLog &log, int notches);
+
 private:
     void DrawBackground(Canvas &canvas, const Rect &area) const;
     void DrawButtons(Canvas &canvas, const Rect &area, bool moreTabs) const;

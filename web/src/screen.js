@@ -28,6 +28,8 @@ export class Screen {
     canvas.addEventListener("pointercancel", () => this.#release());
     canvas.addEventListener("click", (event) =>
       this.engine.click(event.offsetX, event.offsetY));
+    canvas.addEventListener("wheel", (event) => this.#wheel(event),
+      { passive: false });
   }
 
   static size(container) {
@@ -64,6 +66,15 @@ export class Screen {
 
     return event.offsetX < this.canvas.width - SIDEBAR_WIDTH &&
       event.offsetY >= top - 1 && event.offsetY < top + height + 1;
+  }
+
+  /* The page only scrolls when nothing under the pointer does. */
+  #wheel(event) {
+    const notches = Math.sign(event.deltaY);
+
+    if (this.engine.scroll(event.offsetX, event.offsetY, notches)) {
+      event.preventDefault();
+    }
   }
 
   #press(event) {

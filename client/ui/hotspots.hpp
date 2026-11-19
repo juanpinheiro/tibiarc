@@ -39,16 +39,24 @@ enum class Gesture {
     /* Brings a channel of the console to the front; the target is its
      * place among the tabs. */
     SelectChannel,
+    /* Turning the wheel over a window of the sidebar moves its list; the
+     * target tells which window. */
+    ScrollWindow,
+    /* Turning the wheel over the text of the console moves it. */
+    ScrollConsole,
 };
 
 struct Hotspot {
     Rect Area;
     Gesture What;
     uint32_t Target;
+    /* Reacts to the wheel instead of to being pressed. */
+    bool Wheel;
 };
 
-/* The parts of the window that react to being pressed. They are noted down
- * while the window is painted, so they always match what is on screen. */
+/* The parts of the window that react to being pressed or to the wheel. They
+ * are noted down while the window is painted, so they always match what is
+ * on screen. */
 class Hotspots {
 public:
     void Clear() {
@@ -56,13 +64,28 @@ public:
     }
 
     void Add(const Rect &area, Gesture what, uint32_t target = 0) {
-        Spots.push_back(Hotspot{area, what, target});
+        Spots.push_back(Hotspot{area, what, target, false});
     }
 
-    /* What is at a point; of overlapping spots the one painted last. */
+    void AddWheel(const Rect &area, Gesture what, uint32_t target = 0) {
+        Spots.push_back(Hotspot{area, what, target, true});
+    }
+
+    /* What can be pressed at a point; of overlapping spots the one painted
+     * last. */
     std::optional<Hotspot> At(int x, int y) const {
+        return Find(x, y, false);
+    }
+
+    /* What reacts to the wheel at a point. */
+    std::optional<Hotspot> WheelAt(int x, int y) const {
+        return Find(x, y, true);
+    }
+
+private:
+    std::optional<Hotspot> Find(int x, int y, bool wheel) const {
         for (auto it = Spots.rbegin(); it != Spots.rend(); it = std::next(it)) {
-            if (it->Area.Contains(x, y)) {
+            if (it->Wheel == wheel && it->Area.Contains(x, y)) {
                 return *it;
             }
         }
@@ -70,7 +93,6 @@ public:
         return std::nullopt;
     }
 
-private:
     std::vector<Hotspot> Spots;
 };
 

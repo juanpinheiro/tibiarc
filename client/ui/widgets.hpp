@@ -102,14 +102,16 @@ public:
                     std::string_view caption,
                     bool down = false) const;
 
-    /* A vertical scrollbar resting at the top of `total` rows of pixels of
-     * which `page` are in view. There's no thumb when everything is. */
+    /* A vertical scrollbar for `total` rows of pixels of which `page` are
+     * in view, starting `position` rows down. There's no thumb when
+     * everything is in view. */
     void Scrollbar(Canvas &canvas,
                    int x,
                    int y,
                    int height,
                    int total,
-                   int page) const;
+                   int page,
+                   int position = 0) const;
 
     /* A framed bar of which `percent` hundredths are filled. What isn't is
      * left as it was. */

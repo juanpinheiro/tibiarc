@@ -21,6 +21,7 @@ tibiarc-render [OPTION...] data_folder input_path output_prefix
 | `--fps RATE` | Frames per second, instead of `--step` |
 | `--count N` | Number of frames (default 1) |
 | `--click X Y` | Press a point of the window first, as a viewer could; may be repeated |
+| `--scroll X Y N` | Turn the wheel N notches over a point first (down for positive); may be repeated |
 | `--raw` | Write packed 24-bit RGB frames to standard output instead of PNG files |
 | `--discard` | Paint without writing; used by the tests |
 | `--input-version X.Y` | Game version, when the recording doesn't say |

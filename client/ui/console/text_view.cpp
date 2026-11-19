@@ -139,7 +139,8 @@ void DrawConsoleText(Canvas &canvas,
                      const Fonts &fonts,
                      const Skin &skin,
                      const Rect &area,
-                     const ConsoleChannel &channel) {
+                     const ConsoleChannel &channel,
+                     int &linesBack) {
     const Font &font = fonts.Interface;
     const int edge = Skin::Width(FrameLeft);
     const Rect text{area.X + TextMargin,
@@ -152,11 +153,17 @@ void DrawConsoleText(Canvas &canvas,
         Wrap(font, message, text.Width, lines);
     }
 
-    /* The view follows the newest line: the scrollbar counts in lines and
-     * points at the one along the bottom. */
-    const int last = static_cast<int>(lines.size()) - 1;
-    const int first = std::max(last - LinesFitting(font, text.Height) + 1, 0);
-    const int page = last - first;
+    /* The scrollbar counts in lines and points at the one along the bottom,
+     * which is the newest unless the text was scrolled back. A full view
+     * is the furthest back it goes. */
+    const int newest = static_cast<int>(lines.size()) - 1;
+    const int fitting = LinesFitting(font, text.Height);
+    const int page = std::min(newest, std::max(fitting - 1, 0));
+
+    linesBack = std::clamp(linesBack, 0, newest - page);
+
+    const int last = newest - linesBack;
+    const int first = std::max(last - fitting + 1, 0);
 
     DrawFrame(canvas, skin, area);
     DrawScrollbar(canvas,
@@ -165,7 +172,7 @@ void DrawConsoleText(Canvas &canvas,
                        area.Y + edge,
                        ScrollbarWidth,
                        area.Height - 2 * edge},
-                  ScrollRange{page, last, last, page});
+                  ScrollRange{page, newest, last, page});
 
     /* Lines are placed from the bottom up, and only whole ones are shown. */
     int y = text.Bottom() - font.LineHeight();

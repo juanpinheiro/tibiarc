@@ -68,8 +68,9 @@ int WindowStack::Slack() const {
 
 void WindowStack::Place(std::unique_ptr<ContentWindow> window,
                         const Closing &closing,
+                        uint32_t key,
                         bool optional) {
-    Entry entry{std::move(window), closing, 0, optional};
+    Entry entry{std::move(window), closing, key, 0, optional};
     int wanted = entry.Window->InitialHeight() + ContentWindow::BarsHeight;
     int free = FreeHeight();
 
@@ -108,19 +109,31 @@ void WindowStack::Place(std::unique_ptr<ContentWindow> window,
 }
 
 void WindowStack::Open(std::unique_ptr<ContentWindow> window,
-                       const Closing &closing) {
-    Place(std::move(window), closing, false);
+                       const Closing &closing,
+                       uint32_t key) {
+    Place(std::move(window), closing, key, false);
+}
+
+int WindowStack::ScrollStep(uint32_t key) const {
+    for (const Entry &entry : Entries) {
+        if (entry.Key == key) {
+            return entry.Window->ScrollStep();
+        }
+    }
+
+    return 0;
 }
 
 bool WindowStack::OpenIfRoom(std::unique_ptr<ContentWindow> window,
-                             const Closing &closing) {
+                             const Closing &closing,
+                             uint32_t key) {
     const int minimum = window->MinimumHeight() + ContentWindow::BarsHeight;
 
     if (FreeHeight() + Slack() < minimum) {
         return false;
     }
 
-    Place(std::move(window), closing, true);
+    Place(std::move(window), closing, key, true);
 
     return true;
 }
@@ -173,6 +186,7 @@ void WindowStack::DrawFreeArea(Canvas &canvas,
 void WindowStack::Draw(Canvas &canvas,
                        Widgets &widgets,
                        Hotspots &hotspots,
+                       ScrollPositions &scrolls,
                        int x,
                        int y,
                        uint32_t now) const {
@@ -180,12 +194,18 @@ void WindowStack::Draw(Canvas &canvas,
     int top = 0;
 
     for (const Entry &entry : Entries) {
+        const int body = entry.Height - ContentWindow::BarsHeight;
+
         entry.Window->Draw(canvas,
                            widgets,
                            x,
                            y + top,
-                           entry.Height - ContentWindow::BarsHeight,
+                           body,
+                           scrolls[entry.Key],
                            now);
+        hotspots.AddWheel(ContentWindow::Area(x, y + top, body),
+                          Gesture::ScrollWindow,
+                          entry.Key);
         hotspots.Add(ContentWindow::CloseButtonArea(x, y + top),
                      entry.Close.What,
                      entry.Close.Target);

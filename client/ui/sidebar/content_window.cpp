@@ -86,6 +86,10 @@ void DrawFrame(Canvas &canvas, const Skin &skin, int x, int y, int height) {
 
 } // namespace
 
+Rect ContentWindow::Area(int x, int y, int bodyHeight) {
+    return Rect{x, y, Width, bodyHeight + BarsHeight};
+}
+
 Rect ContentWindow::CloseButtonArea(int x, int y) {
     return Rect{x + CloseX,
                 y + ButtonsY,
@@ -102,8 +106,13 @@ void ContentWindow::Draw(Canvas &canvas,
                          int x,
                          int y,
                          int bodyHeight,
+                         int &scroll,
                          uint32_t now) const {
     const int height = bodyHeight + BarsHeight;
+    const int page = PageHeight(bodyHeight);
+
+    scroll = std::clamp(scroll, 0, std::max(0, ContentHeight() - page));
+
     const Rect list{x + Border, y + TitleHeight, ListWidth, bodyHeight};
 
     DrawFrame(canvas, widgets.Pieces, x, y, height);
@@ -126,12 +135,17 @@ void ContentWindow::Draw(Canvas &canvas,
                       list.Y,
                       bodyHeight,
                       ContentHeight(),
-                      PageHeight(bodyHeight));
+                      page,
+                      scroll);
 
     {
+        /* The list is drawn from further up and cut to the body. */
         const ClipScope clip(canvas, list);
 
-        DrawList(canvas, widgets, list, now);
+        DrawList(canvas,
+                 widgets,
+                 Rect{list.X, list.Y - scroll, list.Width, list.Height + scroll},
+                 now);
     }
 
     widgets.Pieces.Draw(canvas,

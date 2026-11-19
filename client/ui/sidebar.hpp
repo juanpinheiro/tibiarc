@@ -63,6 +63,12 @@ public:
         Dismissed.insert(serial);
     }
 
+    /* Moves the list of a window by notches of the wheel, down for
+     * positive ones. */
+    void ScrollWindow(uint32_t key, int notches) {
+        Scrolls[key] += notches * Steps[key];
+    }
+
 private:
     /* Opens the windows to show in `stack`, and tells which of those that
      * have a button made it. */
@@ -83,6 +89,10 @@ private:
     Widgets Tools;
     /* Container windows the viewer has closed. */
     std::unordered_set<uint32_t> Dismissed;
+    /* Where the viewer has scrolled each window to, and how far a notch of
+     * the wheel moves it, as of the last time it was painted. */
+    WindowStack::ScrollPositions Scrolls;
+    std::unordered_map<uint32_t, int> Steps;
 };
 
 } // namespace Client

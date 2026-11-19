@@ -46,10 +46,17 @@ public:
     /* Whether something was added to a channel since it was last seen. */
     bool Unread(const ConsoleChannel &channel) const;
 
+    /* How many lines up from the newest the text of a channel is scrolled.
+     * The text view keeps it within what there is to scroll. */
+    int &LinesBack(const ConsoleChannel &channel) {
+        return Back[channel.Name];
+    }
+
 private:
     std::string Chosen;
     /* The revision of each channel when it was last in front. */
     std::unordered_map<std::string, uint32_t> Seen;
+    std::unordered_map<std::string, int> Back;
 };
 
 } // namespace Client

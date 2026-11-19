@@ -53,6 +53,13 @@ constexpr int PanelsHeight = AutomapPanelHeight + StatusPanelHeight +
                              InventoryPanelHeight + ButtonBarHeight;
 constexpr int FixedHeight = PanelsHeight + Border * 2;
 
+/* Keys that tell the windows of the stack apart. Those of containers follow
+ * the fixed ones, by the serial of the window. */
+constexpr uint32_t SkillsKey = 0;
+constexpr uint32_t BattleKey = 1;
+constexpr uint32_t VIPKey = 2;
+constexpr uint32_t ContainerKey = 3;
+
 void DrawFrame(Canvas &canvas, const Skin &skin, int x, int y) {
     const int right = x + Width - Border;
     const int bottom = y + FixedHeight - Border;
@@ -82,7 +89,8 @@ OpenWindows Sidebar::OpenContentWindows(WindowStack &stack,
             !Dismissed.contains(window.Serial)) {
             stack.Open(std::make_unique<ContainerWindow>(container->second,
                                                          window.InitialItems),
-                       {Gesture::DismissContainer, window.Serial});
+                       {Gesture::DismissContainer, window.Serial},
+                       ContainerKey + window.Serial);
         }
     }
 
@@ -94,18 +102,21 @@ OpenWindows Sidebar::OpenContentWindows(WindowStack &stack,
                 std::make_unique<SkillsWindow>(
                         gamestate.Player,
                         gamestate.Version.Features.CapacityDivisor),
-                {Gesture::ToggleSkills});
+                {Gesture::ToggleSkills},
+                SkillsKey);
     }
 
     if (options.ShowBattleWindow) {
         open.Battle = stack.OpenIfRoom(
                 std::make_unique<BattleWindow>(gamestate, world.Battle),
-                {Gesture::ToggleBattle});
+                {Gesture::ToggleBattle},
+                BattleKey);
     }
 
     if (options.ShowVIPWindow) {
         open.VIP = stack.OpenIfRoom(std::make_unique<VIPWindow>(world.Buddies),
-                                    {Gesture::ToggleVIP});
+                                    {Gesture::ToggleVIP},
+                                    VIPKey);
     }
 
     return open;
@@ -183,7 +194,17 @@ void Sidebar::Draw(Canvas &canvas,
                   open,
                   hotspots,
                   now);
-    stack.Draw(canvas, Tools, hotspots, area.X, area.Y + FixedHeight, now);
+    stack.Draw(canvas,
+               Tools,
+               hotspots,
+               Scrolls,
+               area.X,
+               area.Y + FixedHeight,
+               now);
+
+    for (auto &[key, position] : Scrolls) {
+        Steps[key] = stack.ScrollStep(key);
+    }
 }
 
 } // namespace Client

@@ -56,13 +56,24 @@ public:
      * corner is (x, y). */
     static Rect CloseButtonArea(int x, int y);
 
+    /* How far a notch of the wheel moves the list, in pixels. */
+    virtual int ScrollStep() const {
+        return 14;
+    }
+
+    /* The whole window, title bar included, for one whose top-left corner
+     * is (x, y) and whose body has the given height. */
+    static Rect Area(int x, int y, int bodyHeight);
+
     /* Draws the window with its top-left corner at (x, y) and its body at
-     * the given height. */
+     * the given height. `scroll` is how many pixels down the list is to
+     * start; it is brought within what the list allows. */
     void Draw(Canvas &canvas,
               Widgets &widgets,
               int x,
               int y,
               int bodyHeight,
+              int &scroll,
               uint32_t now) const;
 
 protected:

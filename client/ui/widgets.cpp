@@ -144,7 +144,8 @@ void Widgets::Scrollbar(Canvas &canvas,
                         int y,
                         int height,
                         int total,
-                        int page) const {
+                        int page,
+                        int position) const {
     const int arrow = Skin::Height(ScrollUpSkin);
     const int track = std::max(height - arrow * 2, ScrollTrackMinimumHeight);
     const int caps = Skin::Height(ScrollThumbTopSkin) +
@@ -166,7 +167,7 @@ void Widgets::Scrollbar(Canvas &canvas,
     const int thumb = std::max(
             caps,
             static_cast<int>(static_cast<float>(track) * share));
-    const int top = y + arrow;
+    const int top = y + arrow + (track - thumb) * position / (total - page);
 
     Pieces.Draw(canvas, ScrollThumbTopSkin, x, top);
     Pieces.Tile(canvas,

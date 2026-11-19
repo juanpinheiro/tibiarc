@@ -117,6 +117,12 @@ export class Engine {
     return this.module._trc_click(x, y) !== 0;
   }
 
+  /* Turns the wheel over a point of the window, down for positive
+   * notches: lists of the sidebar, text of the console. */
+  scroll(x, y, notches) {
+    return this.module._trc_scroll(x, y, notches) !== 0;
+  }
+
   /* Paints the window and returns it as an ImageData that is only valid
    * until the next call into the engine. */
   render() {

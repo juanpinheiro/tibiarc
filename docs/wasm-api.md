@@ -34,6 +34,7 @@ context.putImageData(engine.render(), 0, 0);
 | `consoleHeight` | Get or set the height of the console |
 | `click(x, y)` | Press a point of the window; `true` if something was there |
 | `clickable(x, y)` | Whether pressing there does something |
+| `scroll(x, y, notches)` | Turn the wheel over a point, down for positive notches |
 | `splitter` | `{ top, height }` of the bar between game window and console |
 | `close()` | Release the recording |
 
@@ -55,6 +56,7 @@ context.putImageData(engine.render(), 0, 0);
 | `trc_resize(w, h)`, `trc_width()`, `trc_height()` | |
 | `trc_set_console_height(h)`, `trc_console_height()` | |
 | `trc_click(x, y)`, `trc_clickable(x, y)` | Press a point of the window as last painted; 1 if something is there |
+| `trc_scroll(x, y, notches)` | Turn the wheel over a point; 1 if something there moves |
 | `trc_splitter()` | Top in the high 16 bits, height in the low |
 | `trc_render()` | Pointer to RGBA pixels, `width × height × 4` bytes |
 

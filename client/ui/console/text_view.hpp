@@ -34,7 +34,8 @@ void DrawConsoleText(Canvas &canvas,
                      const Fonts &fonts,
                      const Skin &skin,
                      const Rect &area,
-                     const ConsoleChannel &channel);
+                     const ConsoleChannel &channel,
+                     int &linesBack);
 
 } // namespace Client
 } // namespace trc

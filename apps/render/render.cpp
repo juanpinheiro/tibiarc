@@ -28,7 +28,6 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include <utility>
 #include <vector>
 
 using namespace trc;
@@ -56,7 +55,11 @@ int main(int argc, char **argv) {
     uint32_t start = 0, step = 1000, count = 1;
     double fps = 0.0;
     bool discard = false, raw = false;
-    std::vector<std::pair<int, int>> clicks;
+    /* Points to press, or to turn the wheel over when notches are given. */
+    struct Action {
+        int X, Y, Notches;
+    };
+    std::vector<Action> actions;
     VersionTriplet desired;
 
     auto paths = CLI::Process(
@@ -99,7 +102,18 @@ int main(int argc, char **argv) {
                "console. May be given several times",
                {"x", "y"},
                [&](const CLI::Range &args) {
-                   clicks.emplace_back(std::stoi(args[0]), std::stoi(args[1]));
+                   actions.push_back(
+                           {std::stoi(args[0]), std::stoi(args[1]), 0});
+               }}},
+             {"scroll",
+              {"turn the wheel over a point of the window before the frames "
+               "are painted, down for positive notches. May be given "
+               "several times",
+               {"x", "y", "notches"},
+               [&](const CLI::Range &args) {
+                   actions.push_back({std::stoi(args[0]),
+                                      std::stoi(args[1]),
+                                      std::stoi(args[2])});
                }}},
              {"discard",
               {"paint the frames without writing them; for testing",
@@ -161,14 +175,19 @@ int main(int argc, char **argv) {
         std::cerr << "runtime: " << viewer.Playback.Runtime() << " ms"
                   << std::endl;
 
-        /* What can be pressed is known once the window has been painted. */
-        for (const auto &[x, y] : clicks) {
+        /* What reacts is known once the window has been painted. */
+        for (const Action &action : actions) {
             viewer.Playback.Seek(start);
             viewer.Render();
 
-            if (!viewer.Click(x, y)) {
-                std::cerr << "warning: nothing to press at " << x << ", " << y
-                          << std::endl;
+            const bool reacted =
+                    action.Notches == 0
+                            ? viewer.Click(action.X, action.Y)
+                            : viewer.Scroll(action.X, action.Y, action.Notches);
+
+            if (!reacted) {
+                std::cerr << "warning: nothing reacts at " << action.X << ", "
+                          << action.Y << std::endl;
             }
         }
 
