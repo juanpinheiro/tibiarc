@@ -76,6 +76,14 @@ build/apps/render/tibiarc-render --size 800 600 --start 30000 --step 10000 \
     --count 3 path/to/7.70 recording.rec frame-
 ```
 
+For video, pipe raw frames into an encoder:
+
+```sh
+build/apps/render/tibiarc-render --size 1280 720 --fps 30 --count 900 --raw \
+    path/to/7.70 recording.rec - |
+  ffmpeg -f rawvideo -pix_fmt rgb24 -s 1280x720 -r 30 -i - out.mp4
+```
+
 The first argument of every tool is a folder holding the three data files of
 the recording's version.
 

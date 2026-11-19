@@ -28,15 +28,33 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace trc;
+
+static void WriteRaw(const Canvas &picture) {
+    std::vector<uint8_t> row(picture.Width * 3);
+
+    for (int y = 0; y < picture.Height; y++) {
+        for (int x = 0; x < picture.Width; x++) {
+            const Pixel &pixel = picture.GetPixel(x, y);
+
+            row[x * 3 + 0] = pixel.Red;
+            row[x * 3 + 1] = pixel.Green;
+            row[x * 3 + 2] = pixel.Blue;
+        }
+
+        std::fwrite(row.data(), 1, row.size(), stdout);
+    }
+}
 
 /* Renders still frames of a recording to PNG files, for inspecting what the
  * client draws without a browser. */
 int main(int argc, char **argv) {
     int width = 800, height = 600;
     uint32_t start = 0, step = 1000, count = 1;
-    bool discard = false;
+    double fps = 0.0;
+    bool discard = false, raw = false;
     VersionTriplet desired;
 
     auto paths = CLI::Process(
@@ -64,6 +82,15 @@ int main(int argc, char **argv) {
               {"number of frames to write",
                {"frames"},
                [&](const CLI::Range &args) { count = std::stoul(args[0]); }}},
+             {"fps",
+              {"frames per second; an alternative to --step for video",
+               {"rate"},
+               [&](const CLI::Range &args) { fps = std::stod(args[0]); }}},
+             {"raw",
+              {"write the frames to standard output as packed 24-bit RGB "
+               "instead of PNG files, for piping into a video encoder",
+               {},
+               [&]([[maybe_unused]] const CLI::Range &args) { raw = true; }}},
              {"discard",
               {"paint the frames without writing them; for testing",
                {},
@@ -127,11 +154,17 @@ int main(int argc, char **argv) {
         for (uint32_t index = 0; index < count; index++) {
             char suffix[32];
 
-            viewer.Playback.Seek(start + index * step);
+            const uint32_t offset =
+                    fps > 0.0 ? static_cast<uint32_t>(index * 1000.0 / fps)
+                              : index * step;
+
+            viewer.Playback.Seek(start + offset);
 
             const Canvas &picture = viewer.Render();
 
-            if (!discard) {
+            if (raw) {
+                WriteRaw(picture);
+            } else if (!discard) {
                 snprintf(suffix, sizeof(suffix), "%04u.png", index);
                 PNG::Write(picture, paths[2] + suffix);
             }
