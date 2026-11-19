@@ -27,6 +27,7 @@ Drop (or pick) the recording together with the `Tibia.dat`, `Tibia.spr` and
 | Click a tab of the console | Bring that channel to the front |
 | Click Skills / Battle / VIP | Open or close that window, if there is room for it |
 | Mouse wheel over a window of the sidebar or the console text | Scroll it |
+| Scrollbars | Arrows step, the thumb can be dragged, a click on the track beside it turns a page |
 | Click the × of a window in the sidebar | Close it; a container shows again the next time the recording opens it |
 | Open another | Back to the file page |
 

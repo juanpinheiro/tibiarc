@@ -114,16 +114,6 @@ void WindowStack::Open(std::unique_ptr<ContentWindow> window,
     Place(std::move(window), closing, key, false);
 }
 
-int WindowStack::ScrollStep(uint32_t key) const {
-    for (const Entry &entry : Entries) {
-        if (entry.Key == key) {
-            return entry.Window->ScrollStep();
-        }
-    }
-
-    return 0;
-}
-
 bool WindowStack::OpenIfRoom(std::unique_ptr<ContentWindow> window,
                              const Closing &closing,
                              uint32_t key) {
@@ -198,6 +188,8 @@ void WindowStack::Draw(Canvas &canvas,
 
         entry.Window->Draw(canvas,
                            widgets,
+                           hotspots,
+                           entry.Key,
                            x,
                            y + top,
                            body,

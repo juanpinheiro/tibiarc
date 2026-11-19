@@ -21,6 +21,7 @@
 #define __TRC_CLIENT_UI_HOTSPOTS_HPP__
 
 #include "graphics/canvas.hpp"
+#include "ui/scrollbar.hpp"
 
 #include <cstdint>
 #include <optional>
@@ -54,6 +55,16 @@ struct Hotspot {
     bool Wheel;
 };
 
+/* A scrollbar on screen: where it is, what it shows, how far its arrows
+ * move it, and what it scrolls. */
+struct ScrollbarSpot {
+    Rect Area;
+    ScrollRange Range;
+    int Step;
+    Gesture What;
+    uint32_t Target;
+};
+
 /* The parts of the window that react to being pressed or to the wheel. They
  * are noted down while the window is painted, so they always match what is
  * on screen. */
@@ -61,6 +72,21 @@ class Hotspots {
 public:
     void Clear() {
         Spots.clear();
+        Bars.clear();
+    }
+
+    void AddScrollbar(const ScrollbarSpot &bar) {
+        Bars.push_back(bar);
+    }
+
+    std::optional<ScrollbarSpot> ScrollbarAt(int x, int y) const {
+        for (const ScrollbarSpot &bar : Bars) {
+            if (bar.Area.Contains(x, y)) {
+                return bar;
+            }
+        }
+
+        return std::nullopt;
     }
 
     void Add(const Rect &area, Gesture what, uint32_t target = 0) {
@@ -69,6 +95,18 @@ public:
 
     void AddWheel(const Rect &area, Gesture what, uint32_t target = 0) {
         Spots.push_back(Hotspot{area, what, target, true});
+    }
+
+    /* The scrollbar that scrolls a given thing, if it is on screen. */
+    std::optional<ScrollbarSpot> ScrollbarOf(Gesture what,
+                                             uint32_t target) const {
+        for (const ScrollbarSpot &bar : Bars) {
+            if (bar.What == what && bar.Target == target) {
+                return bar;
+            }
+        }
+
+        return std::nullopt;
     }
 
     /* What can be pressed at a point; of overlapping spots the one painted
@@ -94,6 +132,7 @@ private:
     }
 
     std::vector<Hotspot> Spots;
+    std::vector<ScrollbarSpot> Bars;
 };
 
 } // namespace Client

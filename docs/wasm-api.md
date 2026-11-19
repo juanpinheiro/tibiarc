@@ -35,6 +35,7 @@ context.putImageData(engine.render(), 0, 0);
 | `click(x, y)` | Press a point of the window; `true` if something was there |
 | `clickable(x, y)` | Whether pressing there does something |
 | `scroll(x, y, notches)` | Turn the wheel over a point, down for positive notches |
+| `press(x, y)`, `drag(x, y)`, `release(x, y)` | Mouse button down, moving, up: works the scrollbars |
 | `splitter` | `{ top, height }` of the bar between game window and console |
 | `close()` | Release the recording |
 
@@ -57,6 +58,7 @@ context.putImageData(engine.render(), 0, 0);
 | `trc_set_console_height(h)`, `trc_console_height()` | |
 | `trc_click(x, y)`, `trc_clickable(x, y)` | Press a point of the window as last painted; 1 if something is there |
 | `trc_scroll(x, y, notches)` | Turn the wheel over a point; 1 if something there moves |
+| `trc_press(x, y)`, `trc_drag(x, y)`, `trc_release(x, y)` | Mouse button down, moving, up, for scrollbars; press returns 1 on one |
 | `trc_splitter()` | Top in the high 16 bits, height in the low |
 | `trc_render()` | Pointer to RGBA pixels, `width × height × 4` bytes |
 

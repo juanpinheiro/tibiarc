@@ -37,6 +37,7 @@ public:
     }
 
     int InitialHeight() const override;
+    int ScrollStep() const override;
 
 protected:
     std::string_view Title() const override;

@@ -21,6 +21,7 @@
 #define __TRC_CLIENT_UI_SIDEBAR_CONTENT_WINDOW_HPP__
 
 #include "graphics/canvas.hpp"
+#include "ui/hotspots.hpp"
 #include "ui/widgets.hpp"
 
 #include <cstdint>
@@ -56,10 +57,8 @@ public:
      * corner is (x, y). */
     static Rect CloseButtonArea(int x, int y);
 
-    /* How far a notch of the wheel moves the list, in pixels. */
-    virtual int ScrollStep() const {
-        return 14;
-    }
+    /* How far the arrows of the scrollbar move the list, in pixels. */
+    virtual int ScrollStep() const = 0;
 
     /* The whole window, title bar included, for one whose top-left corner
      * is (x, y) and whose body has the given height. */
@@ -67,9 +66,12 @@ public:
 
     /* Draws the window with its top-left corner at (x, y) and its body at
      * the given height. `scroll` is how many pixels down the list is to
-     * start; it is brought within what the list allows. */
+     * start; it is brought within what the list allows. The
+     * scrollbar is noted down as scrolling the window with the given key. */
     void Draw(Canvas &canvas,
               Widgets &widgets,
+              Hotspots &hotspots,
+              uint32_t key,
               int x,
               int y,
               int bodyHeight,

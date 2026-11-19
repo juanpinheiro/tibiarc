@@ -48,8 +48,9 @@ the fix testable.
 - The console starts on the default channel, since a recording doesn't tell
   which one the player was looking at; timestamps are not shown.
 - Only part of the interface reacts to the mouse: console tabs, the
-  Skills, Battle and VIP buttons, closing windows of the sidebar, and the
-  wheel over lists and console text. Scrollbars can't be dragged.
+  Skills, Battle and VIP buttons, closing windows of the sidebar, and
+  scrolling lists and console text (wheel and scrollbars). Arrows of a
+  scrollbar don't repeat while held.
 - No trade window, no minimised windows, no automap marks, no VIP status
   icons.
 - The Skills and Battle windows are placed below the containers when there

@@ -23,6 +23,7 @@
 #include "graphics/canvas.hpp"
 #include "resources/fonts.hpp"
 #include "resources/skin.hpp"
+#include "ui/hotspots.hpp"
 #include "world/console.hpp"
 
 namespace trc {
@@ -35,6 +36,7 @@ void DrawConsoleText(Canvas &canvas,
                      const Skin &skin,
                      const Rect &area,
                      const ConsoleChannel &channel,
+                     Hotspots &hotspots,
                      int &linesBack);
 
 } // namespace Client

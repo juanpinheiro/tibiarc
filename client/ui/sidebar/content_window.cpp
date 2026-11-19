@@ -20,6 +20,7 @@
 #include "ui/sidebar/content_window.hpp"
 
 #include "ui/layout.hpp"
+#include "ui/scrollbar.hpp"
 
 #include <algorithm>
 
@@ -103,6 +104,8 @@ int ContentWindow::AtLeastMinimum(int height) const {
 
 void ContentWindow::Draw(Canvas &canvas,
                          Widgets &widgets,
+                         Hotspots &hotspots,
+                         uint32_t key,
                          int x,
                          int y,
                          int bodyHeight,
@@ -111,7 +114,15 @@ void ContentWindow::Draw(Canvas &canvas,
     const int height = bodyHeight + BarsHeight;
     const int page = PageHeight(bodyHeight);
 
-    scroll = std::clamp(scroll, 0, std::max(0, ContentHeight() - page));
+    const int furthest = std::max(0, ContentHeight() - page);
+
+    scroll = std::clamp(scroll, 0, furthest);
+
+    const ScrollRange range{0, furthest, scroll, page};
+    const Rect bar{x + Border + ListWidth,
+                   y + TitleHeight,
+                   Widgets::ScrollbarWidth,
+                   bodyHeight};
 
     const Rect list{x + Border, y + TitleHeight, ListWidth, bodyHeight};
 
@@ -130,13 +141,12 @@ void ContentWindow::Draw(Canvas &canvas,
     widgets.Button(canvas, CloseButton, x + CloseX, y + ButtonsY);
 
     widgets.Pieces.Tile(canvas, Skin::Background, list);
-    widgets.Scrollbar(canvas,
-                      list.Right(),
-                      list.Y,
-                      bodyHeight,
-                      ContentHeight(),
-                      page,
-                      scroll);
+    DrawScrollbar(canvas, widgets.Pieces, bar, range);
+    hotspots.AddScrollbar(ScrollbarSpot{bar,
+                                        range,
+                                        ScrollStep(),
+                                        Gesture::ScrollWindow,
+                                        key});
 
     {
         /* The list is drawn from further up and cut to the body. */

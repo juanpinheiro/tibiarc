@@ -40,13 +40,6 @@ constexpr int OutfitDirection = 2;
 
 /* Skins of the scrollbar: its arrows, its track, and the thumb, which is
  * two caps with a stretch of body in between. */
-constexpr int ScrollUpSkin = 157;
-constexpr int ScrollDownSkin = 159;
-constexpr int ScrollTrackSkin = 153;
-constexpr int ScrollThumbTopSkin = 154;
-constexpr int ScrollThumbBodySkin = 155;
-constexpr int ScrollThumbBottomSkin = 156;
-constexpr int ScrollTrackMinimumHeight = 14;
 
 /* The caption of a button that is held down moves this far right and down. */
 constexpr int PressedShift = 1;
@@ -137,49 +130,6 @@ void Widgets::TextButton(Canvas &canvas,
           y + slack / 2 + shift,
           CaptionStyle,
           caption);
-}
-
-void Widgets::Scrollbar(Canvas &canvas,
-                        int x,
-                        int y,
-                        int height,
-                        int total,
-                        int page,
-                        int position) const {
-    const int arrow = Skin::Height(ScrollUpSkin);
-    const int track = std::max(height - arrow * 2, ScrollTrackMinimumHeight);
-    const int caps = Skin::Height(ScrollThumbTopSkin) +
-                     Skin::Height(ScrollThumbBottomSkin);
-
-    Pieces.Draw(canvas, ScrollUpSkin, x, y);
-    Pieces.Tile(canvas,
-                ScrollTrackSkin,
-                Rect{x, y + arrow, ScrollbarWidth, track});
-    Pieces.Draw(canvas, ScrollDownSkin, x, y + arrow + track);
-
-    if (total <= page) {
-        return;
-    }
-
-    /* The thumb is as large a share of the track as the page is of the
-     * whole, but never smaller than its two caps. */
-    const float share = static_cast<float>(page) / static_cast<float>(total);
-    const int thumb = std::max(
-            caps,
-            static_cast<int>(static_cast<float>(track) * share));
-    const int top = y + arrow + (track - thumb) * position / (total - page);
-
-    Pieces.Draw(canvas, ScrollThumbTopSkin, x, top);
-    Pieces.Tile(canvas,
-                ScrollThumbBodySkin,
-                Rect{x,
-                     top + Skin::Height(ScrollThumbTopSkin),
-                     ScrollbarWidth,
-                     thumb - caps});
-    Pieces.Draw(canvas,
-                ScrollThumbBottomSkin,
-                x,
-                top + thumb - Skin::Height(ScrollThumbBottomSkin));
 }
 
 void Widgets::Gauge(Canvas &canvas,

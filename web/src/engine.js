@@ -117,6 +117,20 @@ export class Engine {
     return this.module._trc_click(x, y) !== 0;
   }
 
+  /* The mouse button going down, moving and coming up, which works the
+   * scrollbars. `press` tells whether one was there. */
+  press(x, y) {
+    return this.module._trc_press(x, y) !== 0;
+  }
+
+  drag(x, y) {
+    this.module._trc_drag(x, y);
+  }
+
+  release(x, y) {
+    this.module._trc_release(x, y);
+  }
+
   /* Turns the wheel over a point of the window, down for positive
    * notches: lists of the sidebar, text of the console. */
   scroll(x, y, notches) {

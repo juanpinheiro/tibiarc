@@ -65,10 +65,6 @@ public:
                     const Closing &closing,
                     uint32_t key);
 
-    /* How far a notch of the wheel moves the list of a window, or zero if
-     * no window with that key is open. */
-    int ScrollStep(uint32_t key) const;
-
     /* Draws the column with its top-left corner at (x, y), noting where
      * its windows can be closed and scrolled. Positions that reach past
      * the end of a list are brought back within it. */

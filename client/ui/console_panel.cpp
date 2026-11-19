@@ -146,7 +146,13 @@ void ConsolePanel::Draw(Canvas &canvas,
                     area.Width - TextX - TextRight,
                     area.Height - TextY - TextBottom};
 
-    DrawConsoleText(canvas, Text, Pieces, text, front, Focus.LinesBack(front));
+    DrawConsoleText(canvas,
+                    Text,
+                    Pieces,
+                    text,
+                    front,
+                    hotspots,
+                    Focus.LinesBack(front));
     hotspots.AddWheel(text, Gesture::ScrollConsole);
     DrawInputLine(canvas,
                   Text,
@@ -156,13 +162,6 @@ void ConsolePanel::Draw(Canvas &canvas,
                        area.Width - InputX - InputRight,
                        InputHeight},
                   now);
-}
-
-void ConsolePanel::Scroll(const ConsoleLog &log, int notches) {
-    /* Lines a notch of the wheel moves the text. */
-    static constexpr int LinesPerNotch = 3;
-
-    Focus.LinesBack(Focus.Front(log)) -= notches * LinesPerNotch;
 }
 
 } // namespace Client

@@ -128,6 +128,11 @@ void BattleWindow::DrawRow(Canvas &canvas,
                   HealthColor(creature.Health));
 }
 
+/* A third of an entry. */
+int BattleWindow::ScrollStep() const {
+    return 7;
+}
+
 void BattleWindow::DrawList(Canvas &canvas,
                             Widgets &widgets,
                             const Rect &area,

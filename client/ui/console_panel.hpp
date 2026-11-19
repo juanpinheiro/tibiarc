@@ -54,9 +54,11 @@ public:
         Focus.Select(log, place);
     }
 
-    /* Moves the text of the channel in front by notches of the wheel,
-     * towards newer lines for positive ones. */
-    void Scroll(const ConsoleLog &log, int notches);
+    /* Scrolls the text of the channel in front so that it ends the given
+     * number of lines before the newest. */
+    void ScrollBack(const ConsoleLog &log, int lines) {
+        Focus.LinesBack(Focus.Front(log)) = lines;
+    }
 
 private:
     void DrawBackground(Canvas &canvas, const Rect &area) const;

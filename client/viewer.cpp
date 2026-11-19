@@ -127,20 +127,82 @@ bool Viewer::Click(int x, int y) {
     return true;
 }
 
+void Viewer::ScrollTo(const ScrollbarSpot &bar, int value) {
+    value = bar.Range.Clamp(value);
+
+    if (bar.What == Gesture::ScrollWindow) {
+        Side.ScrollWindowTo(bar.Target, value);
+    } else if (bar.What == Gesture::ScrollConsole) {
+        /* The console counts back from its newest line. */
+        Console.ScrollBack(Playback.Surroundings().Console,
+                           bar.Range.Max - value);
+    }
+}
+
 bool Viewer::Scroll(int x, int y, int notches) {
+    /* Steps of the scrollbar a notch of the wheel is worth. */
+    static constexpr int StepsPerNotch = 3;
+
     const auto spot = Spots.WheelAt(x, y);
 
     if (!spot) {
         return false;
     }
 
-    if (spot->What == Gesture::ScrollWindow) {
-        Side.ScrollWindow(spot->Target, notches);
-    } else if (spot->What == Gesture::ScrollConsole) {
-        Console.Scroll(Playback.Surroundings().Console, notches);
+    /* The wheel works the scrollbar of whatever it is turned over. */
+    if (const auto bar = Spots.ScrollbarOf(spot->What, spot->Target)) {
+        ScrollTo(*bar, bar->Range.Value + notches * StepsPerNotch * bar->Step);
     }
 
     return true;
+}
+
+bool Viewer::Press(int x, int y) {
+    const auto bar = Spots.ScrollbarAt(x, y);
+
+    if (!bar) {
+        return false;
+    }
+
+    Grip grip{*bar, ScrollbarParts(bar->Area, bar->Range), std::nullopt};
+
+    if (grip.Parts.Up.Contains(x, y)) {
+        ScrollTo(*bar, bar->Range.Value - bar->Step);
+    } else if (grip.Parts.Down.Contains(x, y)) {
+        ScrollTo(*bar, bar->Range.Value + bar->Step);
+    } else if (grip.Parts.Thumb.Contains(x, y)) {
+        grip.ThumbOffset = y - grip.Parts.Thumb.Y;
+    }
+
+    Held = grip;
+
+    return true;
+}
+
+void Viewer::Drag([[maybe_unused]] int x, int y) {
+    if (Held && Held->ThumbOffset) {
+        const int offset = y - *Held->ThumbOffset - Held->Parts.Track.Y;
+
+        ScrollTo(Held->Bar, Held->Parts.ValueAt(Held->Bar.Range, offset));
+    }
+}
+
+void Viewer::Release(int x, int y) {
+    if (Held && !Held->ThumbOffset && Held->Parts.Track.Contains(x, y) &&
+        !Held->Parts.Thumb.Empty()) {
+        /* Let go on the track beside the thumb: a page towards there, less
+         * a step so that something stays in view. */
+        const ScrollRange &range = Held->Bar.Range;
+        const int turn = range.Page - 1;
+
+        if (y < Held->Parts.Thumb.Y) {
+            ScrollTo(Held->Bar, range.Value - turn);
+        } else if (y >= Held->Parts.Thumb.Bottom()) {
+            ScrollTo(Held->Bar, range.Value + turn);
+        }
+    }
+
+    Held.reset();
 }
 
 } // namespace Client

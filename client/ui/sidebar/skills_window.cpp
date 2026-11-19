@@ -123,6 +123,11 @@ int SkillsWindow::PageHeight(int bodyHeight) const {
     return bodyHeight - MarginY * 2;
 }
 
+/* Half a line of text. */
+int SkillsWindow::ScrollStep() const {
+    return 7;
+}
+
 void SkillsWindow::DrawList(Canvas &canvas,
                             Widgets &widgets,
                             const Rect &area,

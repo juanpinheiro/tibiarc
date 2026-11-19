@@ -256,6 +256,25 @@ EMSCRIPTEN_KEEPALIVE int trc_scroll(int x, int y, int notches) {
     return Current && Current->Viewer->Scroll(x, y, notches) ? 1 : 0;
 }
 
+/* The mouse button going down on, moving over and coming up from the window
+ * as last painted, which is how its scrollbars are worked. `trc_press`
+ * returns 1 if a scrollbar was there. */
+EMSCRIPTEN_KEEPALIVE int trc_press(int x, int y) {
+    return Current && Current->Viewer->Press(x, y) ? 1 : 0;
+}
+
+EMSCRIPTEN_KEEPALIVE void trc_drag(int x, int y) {
+    if (Current) {
+        Current->Viewer->Drag(x, y);
+    }
+}
+
+EMSCRIPTEN_KEEPALIVE void trc_release(int x, int y) {
+    if (Current) {
+        Current->Viewer->Release(x, y);
+    }
+}
+
 /* Paints the window and returns its RGBA pixels, `trc_width` by
  * `trc_height`, valid until the next call into the player. */
 EMSCRIPTEN_KEEPALIVE const uint8_t *trc_render() {

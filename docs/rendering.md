@@ -48,7 +48,8 @@ window of fields around the player:
 
 While the window is painted, the parts that can be pressed are noted down
 as hotspots (`client/ui/hotspots.hpp`): a rectangle and what pressing it
-asks for. `Viewer::Click` looks the point up among those of the last frame,
+asks for; scrollbars are noted with what they show and scroll
+(`client/ui/scrollbar.hpp`). `Viewer::Click` looks the point up among those of the last frame,
 so what reacts is always what is on screen. What the viewer chose — the
 channel in front, which windows are open — is kept by the interface, apart
 from the recording's own state.

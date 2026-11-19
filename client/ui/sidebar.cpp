@@ -201,10 +201,6 @@ void Sidebar::Draw(Canvas &canvas,
                area.X,
                area.Y + FixedHeight,
                now);
-
-    for (auto &[key, position] : Scrolls) {
-        Steps[key] = stack.ScrollStep(key);
-    }
 }
 
 } // namespace Client

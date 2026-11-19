@@ -37,6 +37,7 @@ public:
     explicit VIPWindow(const std::map<uint32_t, World::Buddy> &buddies);
 
     int InitialHeight() const override;
+    int ScrollStep() const override;
 
 protected:
     std::string_view Title() const override;

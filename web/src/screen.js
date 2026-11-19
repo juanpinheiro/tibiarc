@@ -18,14 +18,15 @@ export class Screen {
     this.container = container;
     this.context = canvas.getContext("2d", { alpha: false });
     this.drag = null;
+    this.scrolling = false;
 
     this.observer = new ResizeObserver(() => this.fit());
     this.observer.observe(container);
 
     canvas.addEventListener("pointerdown", (event) => this.#press(event));
     canvas.addEventListener("pointermove", (event) => this.#move(event));
-    canvas.addEventListener("pointerup", () => this.#release());
-    canvas.addEventListener("pointercancel", () => this.#release());
+    canvas.addEventListener("pointerup", (event) => this.#release(event));
+    canvas.addEventListener("pointercancel", (event) => this.#release(event));
     canvas.addEventListener("click", (event) =>
       this.engine.click(event.offsetX, event.offsetY));
     canvas.addEventListener("wheel", (event) => this.#wheel(event),
@@ -81,10 +82,17 @@ export class Screen {
     if (this.#overSplitter(event)) {
       this.drag = { y: event.offsetY, height: this.engine.consoleHeight };
       this.canvas.setPointerCapture(event.pointerId);
+    } else if (this.engine.press(event.offsetX, event.offsetY)) {
+      this.scrolling = true;
+      this.canvas.setPointerCapture(event.pointerId);
     }
   }
 
   #move(event) {
+    if (this.scrolling) {
+      this.engine.drag(event.offsetX, event.offsetY);
+    }
+
     if (this.drag) {
       this.engine.consoleHeight = this.drag.height + this.drag.y - event.offsetY;
     }
@@ -97,7 +105,12 @@ export class Screen {
       !splitting && this.engine.clickable(event.offsetX, event.offsetY));
   }
 
-  #release() {
+  #release(event) {
+    if (this.scrolling) {
+      this.engine.release(event.offsetX, event.offsetY);
+    }
+
     this.drag = null;
+    this.scrolling = false;
   }
 }

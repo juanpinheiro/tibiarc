@@ -17,8 +17,8 @@
  * along with tibiarc. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRC_CLIENT_UI_CONSOLE_SCROLLBAR_HPP__
-#define __TRC_CLIENT_UI_CONSOLE_SCROLLBAR_HPP__
+#ifndef __TRC_CLIENT_UI_SCROLLBAR_HPP__
+#define __TRC_CLIENT_UI_SCROLLBAR_HPP__
 
 #include "graphics/canvas.hpp"
 #include "resources/skin.hpp"
@@ -34,10 +34,31 @@ struct ScrollRange {
     int Max;
     int Value;
     int Page;
+
+    bool Scrollable() const {
+        return Min != Max;
+    }
+
+    int Clamp(int value) const;
 };
 
-/* A vertical scrollbar filling `area`: an arrow button at either end and a
- * track with a thumb in between. */
+/* Where the parts of a vertical scrollbar are: an arrow button at either
+ * end and a track with a thumb in between. */
+struct ScrollbarParts {
+    Rect Up;
+    Rect Track;
+    Rect Down;
+    /* Empty when there is nothing to scroll. */
+    Rect Thumb;
+
+    ScrollbarParts(const Rect &area, const ScrollRange &range);
+
+    /* The value that puts the top of the thumb `offset` pixels below the
+     * top of the track. */
+    int ValueAt(const ScrollRange &range, int offset) const;
+};
+
+/* A vertical scrollbar filling `area`. */
 void DrawScrollbar(Canvas &canvas,
                    const Skin &skin,
                    const Rect &area,

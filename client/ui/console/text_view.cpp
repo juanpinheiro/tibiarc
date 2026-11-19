@@ -19,7 +19,7 @@
 
 #include "ui/console/text_view.hpp"
 
-#include "ui/console/scrollbar.hpp"
+#include "ui/scrollbar.hpp"
 
 #include <algorithm>
 #include <string_view>
@@ -140,6 +140,7 @@ void DrawConsoleText(Canvas &canvas,
                      const Skin &skin,
                      const Rect &area,
                      const ConsoleChannel &channel,
+                     Hotspots &hotspots,
                      int &linesBack) {
     const Font &font = fonts.Interface;
     const int edge = Skin::Width(FrameLeft);
@@ -166,13 +167,15 @@ void DrawConsoleText(Canvas &canvas,
     const int first = std::max(last - fitting + 1, 0);
 
     DrawFrame(canvas, skin, area);
-    DrawScrollbar(canvas,
-                  skin,
-                  Rect{area.Right() - edge - ScrollbarWidth,
-                       area.Y + edge,
-                       ScrollbarWidth,
-                       area.Height - 2 * edge},
-                  ScrollRange{page, newest, last, page});
+    const ScrollRange range{page, newest, last, page};
+    const Rect bar{area.Right() - edge - ScrollbarWidth,
+                   area.Y + edge,
+                   ScrollbarWidth,
+                   area.Height - 2 * edge};
+
+    DrawScrollbar(canvas, skin, bar, range);
+    hotspots.AddScrollbar(
+            ScrollbarSpot{bar, range, 1, Gesture::ScrollConsole, 0});
 
     /* Lines are placed from the bottom up, and only whole ones are shown. */
     int y = text.Bottom() - font.LineHeight();

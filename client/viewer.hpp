@@ -32,6 +32,7 @@
 #include "ui/sidebar.hpp"
 
 #include <memory>
+#include <optional>
 
 namespace trc {
 namespace Client {
@@ -72,8 +73,17 @@ public:
     /* Whether pressing the given point of the window, as last painted,
      * does something. */
     bool Clickable(int x, int y) const {
-        return Spots.At(x, y).has_value();
+        return Spots.At(x, y).has_value() ||
+               Spots.ScrollbarAt(x, y).has_value();
     }
+
+    /* The mouse button going down, moving while down, and coming up again,
+     * which is how scrollbars are worked: their arrows step, their thumb
+     * follows the pointer, and letting go beside the thumb turns a page.
+     * `Press` returns whether a scrollbar was there. */
+    bool Press(int x, int y);
+    void Drag(int x, int y);
+    void Release(int x, int y);
 
     /* Presses a point of the window as last painted: opens and closes the
      * windows of the sidebar, switches between the channels of the
@@ -96,6 +106,18 @@ private:
     Sidebar Side;
     Layout Areas;
     Hotspots Spots;
+
+    /* A scrollbar held down since `Press`. */
+    struct Grip {
+        ScrollbarSpot Bar;
+        ScrollbarParts Parts;
+        /* Where on the thumb it was taken, if it was. */
+        std::optional<int> ThumbOffset;
+    };
+
+    void ScrollTo(const ScrollbarSpot &bar, int value);
+
+    std::optional<Grip> Held;
     int ConsoleHeight = Layout::MinimumConsoleHeight;
     Canvas MapCanvas;
     MapFrame Frame;

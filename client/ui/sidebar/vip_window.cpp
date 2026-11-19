@@ -88,6 +88,11 @@ int VIPWindow::ContentHeight() const {
     return static_cast<int>(Buddies.size()) * RowHeight + ExtraHeight;
 }
 
+/* Half an entry. */
+int VIPWindow::ScrollStep() const {
+    return 8;
+}
+
 void VIPWindow::DrawList(Canvas &canvas,
                          Widgets &widgets,
                          const Rect &area,
