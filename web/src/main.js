@@ -37,8 +37,18 @@ function showIntake() {
     item.querySelector(".detail").textContent = detail;
   }
 
+  const input = $("version-input");
+
   $("version-row").hidden =
     intake.file("recording") === null || intake.detected > 0;
+  $("version-hint").textContent = intake.inferred && !intake.entered
+    ? `Taken from Tibia.dat: ${formatVersion(intake.inferred)}. Change it ` +
+      "if the recording is from another release that shipped the same file."
+    : "";
+
+  if (document.activeElement !== input && !intake.entered) {
+    input.value = intake.inferred ? formatVersion(intake.inferred) : "";
+  }
   $("open-button").disabled = !intake.complete;
 }
 
@@ -94,20 +104,29 @@ function start() {
   $("intake").hidden = true;
   $("stage").hidden = false;
 
-  const result = engine.open({
-    name: recording.name,
-    version: intake.version,
-    recording: recording.bytes,
-    dat: intake.file("dat").bytes,
-    spr: intake.file("spr").bytes,
-    pic: intake.file("pic").bytes,
-    ...Screen.size($("screen")),
-  });
+  let result = OpenResult.Failed;
+  let reason = "";
+
+  try {
+    result = engine.open({
+      name: recording.name,
+      version: intake.version,
+      recording: recording.bytes,
+      dat: intake.file("dat").bytes,
+      spr: intake.file("spr").bytes,
+      pic: intake.file("pic").bytes,
+      ...Screen.size($("screen")),
+    });
+    reason = engine.lastError;
+  } catch (error) {
+    /* The engine itself gave up, which leaves it unusable. */
+    reason = `the player crashed (${error.message}). Reload the page`;
+  }
 
   if (result === OpenResult.Failed) {
     eject();
-    notice.textContent = `Could not open the recording: ${engine.lastError ||
-      "the files don't match its game version."}`;
+    notice.textContent = `Could not open the recording: ${reason ||
+      "the files don't match its game version"}.`;
     return;
   }
 

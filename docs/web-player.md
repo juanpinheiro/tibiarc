@@ -8,8 +8,8 @@ the WebAssembly module first, see [Getting started](getting-started.md).
 Drop (or pick) the recording together with the `Tibia.dat`, `Tibia.spr` and
 `Tibia.pic` of its version. The page shows which of the four it still misses.
 
-- The game version is read from the recording. Formats that don't record it
-  ask you to type it (for example `7.70`).
+- The game version is read from the recording. For formats that don't record
+  it (`.rec`, `.yatc`) it is taken from the `Tibia.dat`, and can be corrected.
 - Nothing is uploaded; the files are read by the browser.
 - The data files are remembered on the device, one set per game version
   (IndexedDB). Next time, a recording of a known version plays on its own.

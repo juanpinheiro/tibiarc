@@ -21,9 +21,12 @@ made with:
 | `Tibia.spr` | Sprites | Of the recording's version |
 | `Tibia.pic` | Fonts and interface pieces | From a 7.x client, ideally 7.7 |
 
+The files may have any name; they are told by their extension.
+
 The interface drawn around the game window is the one of the 7.7 client, cut
-from `Tibia.pic`; a `.pic` from a much later client has a different layout
-and will produce a garbled interface.
+from `Tibia.pic`; pictures of slightly older clients (7.4 was
+tried) lack a few pieces, which are substituted. A `.pic` from a much later
+client has a different layout and will produce a garbled interface.
 
 Keep the files in one folder per version, outside the repository:
 

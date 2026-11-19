@@ -84,6 +84,22 @@ std::vector<int> ActiveConditions(const Gamestate &gamestate) {
     return skins;
 }
 
+/* Older pictures have no strip to put the conditions on; a sunken piece of
+ * the plain background stands in for it. */
+void DrawPlainStrip(Canvas &canvas, const Skin &skin, int x, int y) {
+    const Rect area{x, y, Skin::Width(StripSkin), Skin::Height(StripSkin)};
+
+    skin.Tile(canvas, Skin::Background, area);
+    skin.Tile(canvas, Skin::LineTop, Rect{area.X, area.Y, area.Width, 1});
+    skin.Tile(canvas, Skin::LineLeft, Rect{area.X, area.Y, 1, area.Height});
+    skin.Tile(canvas,
+              Skin::LineRight,
+              Rect{area.Right() - 1, area.Y, 1, area.Height});
+    skin.Tile(canvas,
+              Skin::LineBottom,
+              Rect{area.X, area.Bottom() - 1, area.Width, 1});
+}
+
 } // namespace
 
 void DrawConditionStrip(Canvas &canvas,
@@ -93,7 +109,11 @@ void DrawConditionStrip(Canvas &canvas,
                         const Gamestate &gamestate) {
     const std::vector<int> skins = ActiveConditions(gamestate);
 
-    widgets.Pieces.Draw(canvas, StripSkin, x, y);
+    if (widgets.Pieces.Has(StripSkin)) {
+        widgets.Pieces.Draw(canvas, StripSkin, x, y);
+    } else {
+        DrawPlainStrip(canvas, widgets.Pieces, x, y);
+    }
 
     for (size_t i = 0; i < skins.size() && i < Capacity; i++) {
         widgets.Pieces.Draw(canvas,

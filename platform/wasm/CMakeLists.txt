@@ -38,6 +38,7 @@ target_link_options(tibiarc_wasm PRIVATE
   -sINITIAL_MEMORY=268435456
   -sMAXIMUM_MEMORY=2147483648
   -sFILESYSTEM=0
+  -sSTACK_SIZE=8388608
   "-sEXPORTED_RUNTIME_METHODS=['HEAPU8','UTF8ToString','stringToNewUTF8']"
   "-sEXPORTED_FUNCTIONS=['_malloc','_free']"
 )

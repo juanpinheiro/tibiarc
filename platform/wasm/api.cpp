@@ -17,6 +17,7 @@
  * along with tibiarc. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "assets/signatures.hpp"
 #include "assets/versions.hpp"
 #include "recording/recordings.hpp"
 #include "viewer.hpp"
@@ -99,6 +100,18 @@ EMSCRIPTEN_KEEPALIVE int trc_probe_version(const char *name,
         }
     } catch (const ErrorBase &error) {
         LastError = error.Description();
+    }
+
+    return 0;
+}
+
+/* Tells which game version a `Tibia.dat` belongs to, as major * 100 + minor,
+ * or 0 if the file isn't known. The buffer stays with the caller. */
+EMSCRIPTEN_KEEPALIVE int trc_identify_data(const uint8_t *data, size_t size) {
+    VersionTriplet triplet;
+
+    if (IdentifyTypeFile(DataReader(size, data), triplet)) {
+        return triplet.Major * 100 + triplet.Minor;
     }
 
     return 0;

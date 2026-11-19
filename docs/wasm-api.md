@@ -43,7 +43,8 @@ context.putImageData(engine.render(), 0, 0);
 | Function | |
 | --- | --- |
 | `trc_alloc(size)`, `trc_free(ptr)` | Buffers for handing files over |
-| `trc_probe_version(name, data, size)` | Version as `major * 100 + minor`, or 0 |
+| `trc_probe_version(name, data, size)` | Version a recording names, as `major * 100 + minor`, or 0 |
+| `trc_identify_data(data, size)` | Version a `Tibia.dat` belongs to, same encoding |
 | `trc_open(name, version, pic, n, spr, n, dat, n, rec, n, w, h)` | 1 ok, 2 damaged, 0 failed. Takes ownership of the four buffers |
 | `trc_close()` | |
 | `trc_error()` | Text of the last failure |

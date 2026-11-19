@@ -9,11 +9,16 @@
 | TibiaMovie | `.tmv`, `.tmv2` | yes |
 | TibiaReplay | `.trp` | yes |
 | TibiaTimeMachine | `.ttm` | yes |
-| TibiCAM | `.rec` | guessed from its contents |
-| YATC | `.yatc` | no — pass it |
+| TibiCAM | `.rec` | no |
+| YATC | `.yatc` | no |
 
 `.byn` files can be converted to `.ttm` with
 [TibiaTimeMachine](https://github.com/tulio150/tibia-ttm/).
+
+For formats that don't say their version, the web player takes it from the
+`Tibia.dat` it is given; the command-line tools need `--input-version`.
+Some releases shipped identical data files (7.40 and 7.41, for instance), in
+which case the earliest is assumed and can be corrected on the page.
 
 Damaged recordings are played as far as they can be read.
 
@@ -32,8 +37,8 @@ are not shown; things earlier ones lacked are shown empty.
 | | State |
 | --- | --- |
 | 8.40 `.tmv2`, 8.50 `.yatc` (samples in `tests/`) | Parsed and painted by the test suite |
-| 7.x recordings | Supported by the parser, not covered by a sample |
-| `.rec` decryption | Implemented without external libraries, not covered by a sample |
+| 7.40 `.rec` | Played by hand with the 7.40 data files; no sample in the repository |
+| Encrypted `.rec` (later TibiCAM versions) | Implemented without external libraries, not yet exercised |
 
 Recordings that fail to play are valuable: a sample that can be shared makes
 the fix testable.

@@ -53,6 +53,17 @@ export class Engine {
     }
   }
 
+  /* The game version a Tibia.dat belongs to, or 0 if it isn't known. */
+  identifyData(bytes) {
+    const address = this.#give(bytes);
+
+    try {
+      return this.module._trc_identify_data(address, bytes.length);
+    } finally {
+      this.module._trc_free(address);
+    }
+  }
+
   open({ name, version, recording, dat, spr, pic, width, height }) {
     return this.#withName(name, (text) =>
       this.module._trc_open(

@@ -24,6 +24,7 @@
 
 add_library(tibiarc_core STATIC
   "assets/pictures.cpp"
+  "assets/signatures.cpp"
   "assets/types.cpp"
   "assets/versions.cpp"
   "common/characterset.cpp"

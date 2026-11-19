@@ -8,7 +8,14 @@
 
 import { recall } from "./library.js";
 
-const DATA_SLOTS = { "tibia.dat": "dat", "tibia.spr": "spr", "tibia.pic": "pic" };
+/* Data files are told by their extension, whatever they are called. */
+const DATA_SLOTS = { dat: "dat", spr: "spr", pic: "pic" };
+
+function slotOf(name) {
+  const extension = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
+
+  return DATA_SLOTS[extension] ?? "recording";
+}
 
 export function formatVersion(version) {
   return `${Math.floor(version / 100)}.${String(version % 100).padStart(2, "0")}`;
@@ -25,13 +32,16 @@ export class Intake {
     this.engine = engine;
     this.onChange = onChange;
     this.slots = { recording: null, dat: null, spr: null, pic: null };
+    /* Where the game version can come from, in order of trust: the
+     * recording itself, what the user typed, the Tibia.dat that was picked. */
     this.detected = 0;
     this.entered = 0;
+    this.inferred = 0;
     this.remembered = null;
   }
 
   get version() {
-    return this.detected || this.entered;
+    return this.detected || this.entered || this.inferred;
   }
 
   /* A slot is filled by a file picked now or one remembered from before. */
@@ -46,7 +56,7 @@ export class Intake {
 
   async add(fileList) {
     for (const file of fileList) {
-      const slot = DATA_SLOTS[file.name.toLowerCase()] ?? "recording";
+      const slot = slotOf(file.name);
       const bytes = new Uint8Array(await file.arrayBuffer());
 
       this.slots[slot] = { name: file.name, bytes, fresh: true };
@@ -54,6 +64,8 @@ export class Intake {
       if (slot === "recording") {
         this.detected = this.engine.probeVersion(file.name, bytes);
         this.entered = 0;
+      } else if (slot === "dat") {
+        this.inferred = this.engine.identifyData(bytes);
       }
     }
 

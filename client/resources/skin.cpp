@@ -296,6 +296,30 @@ const Rect &Skin::Area(int id) {
     return Table[id];
 }
 
+bool Skin::Has(int id) const {
+    const Rect &area = Area(id);
+
+    if (area.Empty() || area.Intersect(Atlas.Bounds()) != area) {
+        return false;
+    }
+
+    /* A piece that is one flat colour all over is filler. */
+    const Pixel &first = Atlas.GetPixel(area.X, area.Y);
+
+    for (int y = area.Y; y < area.Bottom(); y++) {
+        for (int x = area.X; x < area.Right(); x++) {
+            const Pixel &pixel = Atlas.GetPixel(x, y);
+
+            if (pixel.Red != first.Red || pixel.Green != first.Green ||
+                pixel.Blue != first.Blue || pixel.Alpha != first.Alpha) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void Skin::Draw(Canvas &canvas, int id, int x, int y) const {
     canvas.Copy(Atlas, Area(id), x, y);
 }

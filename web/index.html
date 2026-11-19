@@ -18,8 +18,8 @@
       <label id="dropzone" tabindex="0">
         <input id="file-input" type="file" multiple hidden>
         <strong>Drop files here, or click to choose</strong>
-        <span>A recording, plus <code>Tibia.dat</code>, <code>Tibia.spr</code> and
-          <code>Tibia.pic</code> from the game version it was made with.</span>
+        <span>A recording, plus the <code>.dat</code>, <code>.spr</code> and
+          <code>.pic</code> of the game version it was made with.</span>
       </label>
 
       <ul id="checklist" aria-label="Files needed">
@@ -31,8 +31,9 @@
 
       <div id="version-row" hidden>
         <label for="version-input">This recording doesn't say which game version it was made
-          with. Enter it:</label>
+          with:</label>
         <input id="version-input" type="text" inputmode="decimal" placeholder="7.70" size="6">
+        <span id="version-hint"></span>
       </div>
 
       <p id="notice" role="status"></p>

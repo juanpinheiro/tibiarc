@@ -55,6 +55,11 @@ public:
         return Area(id).Height;
     }
 
+    /* Whether the picture holds a skin. Pictures of clients older than the
+     * one this table was made for lack a few pieces: where those would be
+     * there is nothing, or a blank filler. */
+    bool Has(int id) const;
+
     /* Draws a skin once, at its own size. */
     void Draw(Canvas &canvas, int id, int x, int y) const;
 
