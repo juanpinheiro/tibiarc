@@ -55,7 +55,7 @@ Checksum::Checksum(const std::string text) {
             throw InvalidDataError();
         }
 
-        for (int i = 0; i < text.size(); i += 2) {
+        for (size_t i = 0; i < text.size(); i += 2) {
             uint8_t high = to_nibble(text[i]), low = to_nibble(text[i + 1]);
             this->operator[](i / 2) = high << 4 | low;
         }
@@ -64,17 +64,13 @@ Checksum::Checksum(const std::string text) {
     }
 }
 
-Checksum::Checksum(const Checksum &other) {
-    std::copy(other.begin(), other.end(), begin());
-}
-
 Checksum::Checksum() {
 }
 
 Checksum::operator std::string() const {
     std::stringstream result;
 
-    for (int i = 0; i < size(); i++) {
+    for (size_t i = 0; i < size(); i++) {
         const char as_hex[] = "0123456789abcdef";
         uint32_t byte = this->operator[](i);
 
@@ -163,7 +159,6 @@ std::optional<RecordingFile> GatherRecordingFile(
     const MemoryFile file(path);
     const auto &reader = file.Reader();
     auto context = Crypto::SHA1::Create();
-    unsigned int size;
     Checksum checksum;
 
     context->Hash(reader.Data, reader.Length, checksum.data());

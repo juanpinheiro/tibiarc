@@ -134,10 +134,6 @@ struct VersionTriplet {
         : Major(major), Minor(minor), Preview(preview) {
     }
 
-    VersionTriplet(const VersionTriplet &other)
-        : VersionTriplet(other.Major, other.Minor, other.Preview) {
-    }
-
     VersionTriplet() : VersionTriplet(0, 0, 0) {
     }
 

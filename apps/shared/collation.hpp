@@ -37,7 +37,8 @@ static constexpr size_t SHA1Size = 20;
 
 struct Checksum : std::array<uint8_t, SHA1Size> {
     Checksum(const std::string text);
-    Checksum(const Checksum &other);
+    Checksum(const Checksum &other) = default;
+    Checksum &operator=(const Checksum &other) = default;
     Checksum();
 
     operator std::string() const;

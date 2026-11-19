@@ -610,7 +610,7 @@ static json ToJSON([[maybe_unused]] const Version &version,
 }
 
 static json ToJSON([[maybe_unused]] const Version &version,
-                   const PlayerTradeClosed &event) {
+                   [[maybe_unused]] const PlayerTradeClosed &event) {
     return json{};
 }
 
@@ -677,7 +677,8 @@ static json ToJSON(const Version &version,
     return result;
 }
 
-static json ToJSON(const Version &version, const ChannelListUpdated &event) {
+static json ToJSON([[maybe_unused]] const Version &version,
+                   const ChannelListUpdated &event) {
     return json{{"Channels", event.Channels}};
 }
 
@@ -693,11 +694,12 @@ static json ToJSON(const Version &version, const ChannelOpened &event) {
     return result;
 }
 
-static json ToJSON(const Version &version, const ChannelClosed &event) {
+static json ToJSON([[maybe_unused]] const Version &version,
+                   const ChannelClosed &event) {
     return json{{"ChannelId", event.Id}};
 }
 
-static json ToJSON(const Version &version,
+static json ToJSON([[maybe_unused]] const Version &version,
                    const PrivateConversationOpened &event) {
     return json{{"PlayerName", CharacterSet::ToUtf8(event.Name)}};
 }
@@ -709,7 +711,8 @@ static json ToJSON(const Version &version, const ContainerOpened &event) {
                 {"Items", ToJSON(version, event.Items)}};
 }
 
-static json ToJSON(const Version &version, const ContainerClosed &event) {
+static json ToJSON([[maybe_unused]] const Version &version,
+                   const ContainerClosed &event) {
     return json{{"ContainerId", event.ContainerId}};
 }
 
@@ -725,7 +728,8 @@ static json ToJSON(const Version &version,
                 {"Item", ToJSON(version, event.Item)}};
 }
 
-static json ToJSON(const Version &version, const ContainerRemovedItem &event) {
+static json ToJSON([[maybe_unused]] const Version &version,
+                   const ContainerRemovedItem &event) {
     return json{{"ContainerId", event.ContainerId},
                 {"ContainerIndex", event.ContainerIndex}};
 }
