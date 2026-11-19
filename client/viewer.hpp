@@ -26,6 +26,9 @@
 #include "resources/skin.hpp"
 #include "scene/mapview.hpp"
 #include "scene/overlay.hpp"
+#include "ui/console_panel.hpp"
+#include "ui/layout.hpp"
+#include "ui/sidebar.hpp"
 
 #include <memory>
 
@@ -46,6 +49,14 @@ public:
 
     void Resize(int width, int height);
 
+    /* The height the console would like to have; the game window takes
+     * what is left above it. */
+    void SetConsoleHeight(int height);
+
+    const Layout &Arrangement() const {
+        return Areas;
+    }
+
     /* Paints the window as of the session's current time. */
     const Canvas &Render();
 
@@ -57,6 +68,10 @@ private:
     Skin Pieces;
     MapRenderer Renderer;
     MapOverlay Overlay;
+    ConsolePanel Console;
+    Sidebar Side;
+    Layout Areas;
+    int ConsoleHeight = Layout::MinimumConsoleHeight;
     Canvas MapCanvas;
     MapFrame Frame;
     std::unique_ptr<Canvas> Window;

@@ -19,6 +19,8 @@
 
 #include "viewer.hpp"
 
+#include "ui/mapframe.hpp"
+
 #include <algorithm>
 
 namespace trc {
@@ -33,6 +35,8 @@ Viewer::Viewer(const Version &version,
       Text(version.Pictures),
       Pieces(version.Pictures.Get(PictureIndex::Icons)),
       Overlay(Text, Pieces),
+      Console(Text, Pieces),
+      Side(version, Text, Pieces),
       MapCanvas(MapFrame::Width, MapFrame::Height) {
     Resize(width, height);
 }
@@ -44,25 +48,49 @@ void Viewer::Resize(int width, int height) {
     if (!Window || Window->Width != width || Window->Height != height) {
         Window = std::make_unique<Canvas>(width, height);
     }
+
+    Areas = Layout::Compute(width,
+                            height,
+                            ConsoleHeight,
+                            Playback.Preferences.NoStretching);
+}
+
+void Viewer::SetConsoleHeight(int height) {
+    ConsoleHeight = height;
+    Resize(Window->Width, Window->Height);
 }
 
 const Canvas &Viewer::Render() {
     Canvas &canvas = *Window;
     const uint32_t now = Playback.Now();
-    const Rect view = canvas.Bounds();
+    const Gamestate &state = Playback.State();
+    const World &world = Playback.Surroundings();
+    const Options &options = Playback.Preferences;
+    const Rect view = Areas.View.Translate(Areas.MapFrame.X, Areas.MapFrame.Y);
 
     canvas.SetClip(canvas.Bounds());
-    canvas.Fill(canvas.Bounds(), Pixel(0, 0, 0));
 
-    Renderer.Render(Playback.State(), now, MapCanvas, Frame);
-    canvas.Stretch(MapCanvas, MapCanvas.Bounds(), view);
-    Overlay.Draw(canvas,
-                 view,
-                 Frame,
-                 Playback.State(),
-                 Playback.Surroundings(),
-                 Playback.Preferences,
-                 now);
+    Console.Draw(canvas, Areas.Console, world.Console, now);
+    Side.Draw(canvas, Areas.Sidebar, state, world, now);
+    DrawMapFrame(canvas, Pieces, Areas);
+
+    Renderer.Render(state, now, MapCanvas, Frame);
+
+    if (options.NoStretching) {
+        /* The middle of the map at its own size. */
+        canvas.Copy(MapCanvas,
+                    Rect{(MapFrame::Width - view.Width) / 2,
+                         (MapFrame::Height - view.Height) / 2,
+                         view.Width,
+                         view.Height},
+                    view.X,
+                    view.Y);
+    } else {
+        canvas.Stretch(MapCanvas, MapCanvas.Bounds(), view);
+    }
+
+    Overlay.Draw(canvas, view, Frame, state, world, options, now);
+    DrawSplitter(canvas, Pieces, Areas);
 
     return canvas;
 }
