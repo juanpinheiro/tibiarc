@@ -31,6 +31,7 @@ void World::Reset() {
     Chart.Clear();
     Battle.Clear();
     OpenContainers.clear();
+    ContainerWindowsOpened = 0;
 }
 
 void World::OpenContainerWindow(uint32_t id, const Gamestate &gamestate) {
@@ -45,7 +46,8 @@ void World::OpenContainerWindow(uint32_t id, const Gamestate &gamestate) {
         container != gamestate.Containers.end()) {
         OpenContainers.push_back(OpenContainer{
                 id,
-                static_cast<int>(container->second.Items.size())});
+                static_cast<int>(container->second.Items.size()),
+                ContainerWindowsOpened++});
     }
 }
 

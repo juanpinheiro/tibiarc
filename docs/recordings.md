@@ -45,7 +45,10 @@ the fix testable.
 
 ## Known gaps in the interface
 
-- The console always shows the default channel; timestamps are not shown.
+- The console starts on the default channel, since a recording doesn't tell
+  which one the player was looking at; timestamps are not shown.
+- Only part of the interface reacts to the mouse: console tabs, the
+  Skills, Battle and VIP buttons, and closing windows of the sidebar.
 - No trade window, no minimised windows, no automap marks, no VIP status
   icons.
 - The Skills and Battle windows are placed below the containers when there

@@ -25,12 +25,14 @@
 #include "graphics/canvas.hpp"
 #include "resources/fonts.hpp"
 #include "resources/skin.hpp"
+#include "ui/hotspots.hpp"
 #include "ui/sidebar/button_bar.hpp"
 #include "ui/sidebar/window_stack.hpp"
 #include "ui/widgets.hpp"
 #include "world/world.hpp"
 
 #include <cstdint>
+#include <unordered_set>
 
 namespace trc {
 namespace Client {
@@ -46,18 +48,27 @@ public:
         : Tools(version, fonts, skin) {
     }
 
+    /* Paints the sidebar, noting what in it can be pressed. */
     void Draw(Canvas &canvas,
               const Rect &area,
               const Gamestate &gamestate,
               const World &world,
+              Hotspots &hotspots,
               uint32_t now);
+
+    /* Closes the window of a container, told by the serial of the window.
+     * The container stays open in the game, and shows again the next time
+     * the recording opens it. */
+    void DismissContainer(uint32_t serial) {
+        Dismissed.insert(serial);
+    }
 
 private:
     /* Opens the windows to show in `stack`, and tells which of those that
      * have a button made it. */
-    static OpenWindows OpenContentWindows(WindowStack &stack,
-                                          const Gamestate &gamestate,
-                                          const World &world);
+    OpenWindows OpenContentWindows(WindowStack &stack,
+                                   const Gamestate &gamestate,
+                                   const World &world) const;
 
     /* Draws the fixed part with its top-left corner at (x, y). */
     void DrawFixedPart(Canvas &canvas,
@@ -66,9 +77,12 @@ private:
                        const Gamestate &gamestate,
                        const World &world,
                        const OpenWindows &open,
+                       Hotspots &hotspots,
                        uint32_t now);
 
     Widgets Tools;
+    /* Container windows the viewer has closed. */
+    std::unordered_set<uint32_t> Dismissed;
 };
 
 } // namespace Client

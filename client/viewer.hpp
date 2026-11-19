@@ -27,6 +27,7 @@
 #include "scene/mapview.hpp"
 #include "scene/overlay.hpp"
 #include "ui/console_panel.hpp"
+#include "ui/hotspots.hpp"
 #include "ui/layout.hpp"
 #include "ui/sidebar.hpp"
 
@@ -68,6 +69,17 @@ public:
     /* Paints the window as of the session's current time. */
     const Canvas &Render();
 
+    /* Whether pressing the given point of the window, as last painted,
+     * does something. */
+    bool Clickable(int x, int y) const {
+        return Spots.At(x, y).has_value();
+    }
+
+    /* Presses a point of the window as last painted: opens and closes the
+     * windows of the sidebar, switches between the channels of the
+     * console. Returns whether anything was there to press. */
+    bool Click(int x, int y);
+
     Session Playback;
 
 private:
@@ -78,6 +90,7 @@ private:
     ConsolePanel Console;
     Sidebar Side;
     Layout Areas;
+    Hotspots Spots;
     int ConsoleHeight = Layout::MinimumConsoleHeight;
     Canvas MapCanvas;
     MapFrame Frame;

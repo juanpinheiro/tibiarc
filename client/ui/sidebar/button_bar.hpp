@@ -21,6 +21,7 @@
 #define __TRC_CLIENT_UI_SIDEBAR_BUTTON_BAR_HPP__
 
 #include "graphics/canvas.hpp"
+#include "ui/hotspots.hpp"
 #include "ui/widgets.hpp"
 
 namespace trc {
@@ -40,6 +41,7 @@ struct OpenWindows {
  * top-left corner is (x, y). */
 void DrawButtonBar(Canvas &canvas,
                    const Widgets &widgets,
+                   Hotspots &hotspots,
                    int x,
                    int y,
                    const OpenWindows &open);

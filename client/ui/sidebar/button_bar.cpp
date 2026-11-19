@@ -33,21 +33,30 @@ constexpr int SkillsX = 8, BattleX = 45, VIPX = 82, LogoutX = 124;
 
 void DrawButtonBar(Canvas &canvas,
                    const Widgets &widgets,
+                   Hotspots &hotspots,
                    int x,
                    int y,
                    const OpenWindows &open) {
-    const auto toggle = [&](int left, std::string_view caption, bool down) {
+    const auto toggle = [&](int left,
+                            std::string_view caption,
+                            bool down,
+                            Gesture gesture) {
         widgets.TextButton(canvas,
                            ButtonSkins::Narrow,
                            x + left,
                            y + ButtonsY,
                            caption,
                            down);
+        hotspots.Add(Rect{x + left,
+                          y + ButtonsY,
+                          Skin::Width(ButtonSkins::Narrow.Up),
+                          Skin::Height(ButtonSkins::Narrow.Up)},
+                     gesture);
     };
 
-    toggle(SkillsX, "Skills", open.Skills);
-    toggle(BattleX, "Battle", open.Battle);
-    toggle(VIPX, "VIP", open.VIP);
+    toggle(SkillsX, "Skills", open.Skills, Gesture::ToggleSkills);
+    toggle(BattleX, "Battle", open.Battle, Gesture::ToggleBattle);
+    toggle(VIPX, "VIP", open.VIP, Gesture::ToggleVIP);
 
     widgets.TextButton(canvas,
                        ButtonSkins::Regular,

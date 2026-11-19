@@ -28,6 +28,7 @@ set(TIBIARC_TEST_DATA "${CMAKE_CURRENT_SOURCE_DIR}/data" CACHE PATH
 
 add_executable(unit_tests
   "unit/animation_test.cpp"
+  "unit/hotspots_test.cpp"
   "unit/layout_test.cpp"
   "unit/main.cpp"
 )

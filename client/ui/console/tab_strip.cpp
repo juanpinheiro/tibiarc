@@ -64,10 +64,11 @@ static std::string Caption(const Font &font, const std::string &name) {
 
 static Pixel CaptionColor(const ConsoleChannel &channel,
                           bool active,
+                          bool unread,
                           uint32_t now) {
     if (active) {
         return ActiveColor;
-    } else if (!channel.UnreadSince) {
+    } else if (!unread || !channel.UnreadSince) {
         return InactiveColor;
     }
 
@@ -81,14 +82,17 @@ bool DrawTabStrip(Canvas &canvas,
                   const Skin &skin,
                   const Rect &area,
                   const ConsoleLog &log,
+                  const ConsoleFocus &focus,
+                  Hotspots &hotspots,
                   uint32_t now) {
     const int tabWidth = Skin::Width(TabActive);
+    const ConsoleChannel &front = focus.Front(log);
+    uint32_t place = 0;
     int x = area.X;
 
     for (const auto &channel : log.All()) {
-        /* Nothing in a recording tells which tab the player was looking
-         * at, so the default channel is the one in front throughout. */
-        const bool active = (channel.get() == &log.Default());
+        const bool active = (channel.get() == &front);
+        const bool unread = focus.Unread(*channel);
 
         /* Tabs are never squeezed or cut off. */
         if (x + tabWidth > area.Right()) {
@@ -99,10 +103,13 @@ bool DrawTabStrip(Canvas &canvas,
         fonts.Game.Draw(canvas,
                         x + CaptionX,
                         area.Y + CaptionY,
-                        CaptionColor(*channel, active, now),
+                        CaptionColor(*channel, active, unread, now),
                         Caption(fonts.Game, channel->Name),
                         Align::Center);
 
+        hotspots.Add(Rect{x, area.Y, tabWidth, Skin::Height(TabActive)},
+                     Gesture::SelectChannel,
+                     place++);
         x += tabWidth;
     }
 

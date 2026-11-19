@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace trc;
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
     uint32_t start = 0, step = 1000, count = 1;
     double fps = 0.0;
     bool discard = false, raw = false;
+    std::vector<std::pair<int, int>> clicks;
     VersionTriplet desired;
 
     auto paths = CLI::Process(
@@ -91,6 +93,14 @@ int main(int argc, char **argv) {
                "instead of PNG files, for piping into a video encoder",
                {},
                [&]([[maybe_unused]] const CLI::Range &args) { raw = true; }}},
+             {"click",
+              {"press a point of the window before the frames are painted, "
+               "as a viewer could: buttons of the sidebar, tabs of the "
+               "console. May be given several times",
+               {"x", "y"},
+               [&](const CLI::Range &args) {
+                   clicks.emplace_back(std::stoi(args[0]), std::stoi(args[1]));
+               }}},
              {"discard",
               {"paint the frames without writing them; for testing",
                {},
@@ -150,6 +160,17 @@ int main(int argc, char **argv) {
 
         std::cerr << "runtime: " << viewer.Playback.Runtime() << " ms"
                   << std::endl;
+
+        /* What can be pressed is known once the window has been painted. */
+        for (const auto &[x, y] : clicks) {
+            viewer.Playback.Seek(start);
+            viewer.Render();
+
+            if (!viewer.Click(x, y)) {
+                std::cerr << "warning: nothing to press at " << x << ", " << y
+                          << std::endl;
+            }
+        }
 
         for (uint32_t index = 0; index < count; index++) {
             char suffix[32];

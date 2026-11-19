@@ -106,6 +106,17 @@ export class Engine {
     this.module._trc_set_console_height(height);
   }
 
+  /* Whether pressing a point of the window does something. */
+  clickable(x, y) {
+    return this.module._trc_clickable(x, y) !== 0;
+  }
+
+  /* Presses a point of the window: buttons of the sidebar, tabs of the
+   * console. */
+  click(x, y) {
+    return this.module._trc_click(x, y) !== 0;
+  }
+
   /* Paints the window and returns it as an ImageData that is only valid
    * until the next call into the engine. */
   render() {

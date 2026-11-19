@@ -86,6 +86,13 @@ void DrawFrame(Canvas &canvas, const Skin &skin, int x, int y, int height) {
 
 } // namespace
 
+Rect ContentWindow::CloseButtonArea(int x, int y) {
+    return Rect{x + CloseX,
+                y + ButtonsY,
+                Skin::Width(CloseButton.Up),
+                Skin::Height(CloseButton.Up)};
+}
+
 int ContentWindow::AtLeastMinimum(int height) const {
     return std::max(height, MinimumHeight());
 }

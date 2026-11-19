@@ -69,8 +69,9 @@ const Canvas &Viewer::Render() {
 
     canvas.SetClip(canvas.Bounds());
 
-    Console.Draw(canvas, Areas.Console, world.Console, now);
-    Side.Draw(canvas, Areas.Sidebar, state, world, now);
+    Spots.Clear();
+    Console.Draw(canvas, Areas.Console, world.Console, Spots, now);
+    Side.Draw(canvas, Areas.Sidebar, state, world, Spots, now);
     DrawMapFrame(canvas, Pieces, Areas);
 
     Renderer.Render(state, now, MapCanvas, Frame);
@@ -92,6 +93,35 @@ const Canvas &Viewer::Render() {
     DrawSplitter(canvas, Pieces, Areas);
 
     return canvas;
+}
+
+bool Viewer::Click(int x, int y) {
+    const auto spot = Spots.At(x, y);
+    Options &options = Playback.Preferences;
+
+    if (!spot) {
+        return false;
+    }
+
+    switch (spot->What) {
+    case Gesture::ToggleSkills:
+        options.ShowSkillsWindow = !options.ShowSkillsWindow;
+        break;
+    case Gesture::ToggleBattle:
+        options.ShowBattleWindow = !options.ShowBattleWindow;
+        break;
+    case Gesture::ToggleVIP:
+        options.ShowVIPWindow = !options.ShowVIPWindow;
+        break;
+    case Gesture::DismissContainer:
+        Side.DismissContainer(spot->Target);
+        break;
+    case Gesture::SelectChannel:
+        Console.SelectChannel(Playback.Surroundings().Console, spot->Target);
+        break;
+    }
+
+    return true;
 }
 
 } // namespace Client

@@ -32,6 +32,7 @@ add_library(tibiarc_client STATIC
   "scene/outfits.cpp"
   "scene/overlay.cpp"
   "scene/parts.cpp"
+  "ui/console/focus.cpp"
   "ui/console/input_line.cpp"
   "ui/console/scrollbar.cpp"
   "ui/console/tab_strip.cpp"

@@ -52,6 +52,10 @@ public:
     /* The height the body is given when the window is opened. */
     virtual int InitialHeight() const = 0;
 
+    /* Where the button that closes a window is, for one whose top-left
+     * corner is (x, y). */
+    static Rect CloseButtonArea(int x, int y);
+
     /* Draws the window with its top-left corner at (x, y) and its body at
      * the given height. */
     void Draw(Canvas &canvas,

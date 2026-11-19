@@ -24,6 +24,9 @@ Drop (or pick) the recording together with the `Tibia.dat`, `Tibia.spr` and
 | Speed | ¼× to 64× |
 | Fullscreen | Player fills the screen |
 | Drag the bar between game window and console | Resize the console, as in the client |
+| Click a tab of the console | Bring that channel to the front |
+| Click Skills / Battle / VIP | Open or close that window, if there is room for it |
+| Click the × of a window in the sidebar | Close it; a container shows again the next time the recording opens it |
 | Open another | Back to the file page |
 
 The window follows the size of the page, one canvas pixel per CSS pixel, and

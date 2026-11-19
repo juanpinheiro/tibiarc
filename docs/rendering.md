@@ -44,6 +44,15 @@ window of fields around the player:
    light sources with a falloff over their radius. The map is multiplied by
    that light interpolated smoothly across fields (`scene/light.cpp`).
 
+## Interaction
+
+While the window is painted, the parts that can be pressed are noted down
+as hotspots (`client/ui/hotspots.hpp`): a rectangle and what pressing it
+asks for. `Viewer::Click` looks the point up among those of the last frame,
+so what reacts is always what is on screen. What the viewer chose — the
+channel in front, which windows are open — is kept by the interface, apart
+from the recording's own state.
+
 ## Scaling and overlays
 
 The 480×352 picture is scaled to the view with **bilinear filtering**. Only

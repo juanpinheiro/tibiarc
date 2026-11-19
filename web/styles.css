@@ -197,6 +197,10 @@ button:disabled {
   cursor: ns-resize;
 }
 
+#canvas.pressable {
+  cursor: pointer;
+}
+
 #controls {
   display: flex;
   align-items: center;

@@ -239,6 +239,17 @@ EMSCRIPTEN_KEEPALIVE int trc_console_height() {
     return Current ? Current->Viewer->Arrangement().Console.Height : 0;
 }
 
+/* Whether pressing a point of the window, as last painted, does something. */
+EMSCRIPTEN_KEEPALIVE int trc_clickable(int x, int y) {
+    return Current && Current->Viewer->Clickable(x, y) ? 1 : 0;
+}
+
+/* Presses a point of the window as last painted. Returns 1 if something was
+ * there to press. */
+EMSCRIPTEN_KEEPALIVE int trc_click(int x, int y) {
+    return Current && Current->Viewer->Click(x, y) ? 1 : 0;
+}
+
 /* Paints the window and returns its RGBA pixels, `trc_width` by
  * `trc_height`, valid until the next call into the player. */
 EMSCRIPTEN_KEEPALIVE const uint8_t *trc_render() {

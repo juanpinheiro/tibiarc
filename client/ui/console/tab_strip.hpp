@@ -23,6 +23,8 @@
 #include "graphics/canvas.hpp"
 #include "resources/fonts.hpp"
 #include "resources/skin.hpp"
+#include "ui/console/focus.hpp"
+#include "ui/hotspots.hpp"
 #include "world/console.hpp"
 
 #include <cstdint>
@@ -31,13 +33,16 @@ namespace trc {
 namespace Client {
 
 /* The row of tabs along the top of the console, one per open channel in
- * the order they were opened. Returns whether there were more tabs than
- * fit in `area`; those are left out. */
+ * the order they were opened, each of which brings its channel to the
+ * front when pressed. Returns whether there were more tabs than fit in
+ * `area`; those are left out. */
 bool DrawTabStrip(Canvas &canvas,
                   const Fonts &fonts,
                   const Skin &skin,
                   const Rect &area,
                   const ConsoleLog &log,
+                  const ConsoleFocus &focus,
+                  Hotspots &hotspots,
                   uint32_t now);
 
 } // namespace Client

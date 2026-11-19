@@ -54,6 +54,9 @@ public:
     struct OpenContainer {
         uint32_t Id;
         int InitialItems;
+        /* Tells this window from every other one of the session, including
+         * later ones of the same container. */
+        uint32_t Serial;
     };
 
     explicit World(const Options &options) : Preferences(options) {
@@ -80,6 +83,7 @@ public:
     BattleList Battle;
     /* In the order the windows were opened. */
     std::vector<OpenContainer> OpenContainers;
+    uint32_t ContainerWindowsOpened = 0;
 
 private:
     void OpenContainerWindow(uint32_t id, const Gamestate &gamestate);

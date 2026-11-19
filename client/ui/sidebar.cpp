@@ -71,16 +71,18 @@ void DrawFrame(Canvas &canvas, const Skin &skin, int x, int y) {
 
 OpenWindows Sidebar::OpenContentWindows(WindowStack &stack,
                                         const Gamestate &gamestate,
-                                        const World &world) {
+                                        const World &world) const {
     const Options &options = world.Settings();
     OpenWindows open;
 
     for (const World::OpenContainer &window : world.OpenContainers) {
         const auto container = gamestate.Containers.find(window.Id);
 
-        if (container != gamestate.Containers.end()) {
+        if (container != gamestate.Containers.end() &&
+            !Dismissed.contains(window.Serial)) {
             stack.Open(std::make_unique<ContainerWindow>(container->second,
-                                                         window.InitialItems));
+                                                         window.InitialItems),
+                       {Gesture::DismissContainer, window.Serial});
         }
     }
 
@@ -88,18 +90,22 @@ OpenWindows Sidebar::OpenContentWindows(WindowStack &stack,
      * are opened once the containers have taken the room they need, sized
      * as if the buttons had been pressed just now. */
     if (options.ShowSkillsWindow) {
-        open.Skills = stack.OpenIfRoom(std::make_unique<SkillsWindow>(
-                gamestate.Player,
-                gamestate.Version.Features.CapacityDivisor));
+        open.Skills = stack.OpenIfRoom(
+                std::make_unique<SkillsWindow>(
+                        gamestate.Player,
+                        gamestate.Version.Features.CapacityDivisor),
+                {Gesture::ToggleSkills});
     }
 
     if (options.ShowBattleWindow) {
         open.Battle = stack.OpenIfRoom(
-                std::make_unique<BattleWindow>(gamestate, world.Battle));
+                std::make_unique<BattleWindow>(gamestate, world.Battle),
+                {Gesture::ToggleBattle});
     }
 
     if (options.ShowVIPWindow) {
-        open.VIP = stack.OpenIfRoom(std::make_unique<VIPWindow>(world.Buddies));
+        open.VIP = stack.OpenIfRoom(std::make_unique<VIPWindow>(world.Buddies),
+                                    {Gesture::ToggleVIP});
     }
 
     return open;
@@ -111,6 +117,7 @@ void Sidebar::DrawFixedPart(Canvas &canvas,
                             const Gamestate &gamestate,
                             const World &world,
                             const OpenWindows &open,
+                            Hotspots &hotspots,
                             uint32_t now) {
     const int left = x + Border;
     int top = 0;
@@ -150,20 +157,33 @@ void Sidebar::DrawFixedPart(Canvas &canvas,
                        panel(InventoryPanelHeight),
                        gamestate,
                        now);
-    DrawButtonBar(canvas, Tools, left, panel(ButtonBarHeight), open);
+    DrawButtonBar(canvas,
+                  Tools,
+                  hotspots,
+                  left,
+                  panel(ButtonBarHeight),
+                  open);
 }
 
 void Sidebar::Draw(Canvas &canvas,
                    const Rect &area,
                    const Gamestate &gamestate,
                    const World &world,
+                   Hotspots &hotspots,
                    uint32_t now) {
     const ClipScope clip(canvas, area);
     WindowStack stack(area.Height - FixedHeight);
     const OpenWindows open = OpenContentWindows(stack, gamestate, world);
 
-    DrawFixedPart(canvas, area.X, area.Y, gamestate, world, open, now);
-    stack.Draw(canvas, Tools, area.X, area.Y + FixedHeight, now);
+    DrawFixedPart(canvas,
+                  area.X,
+                  area.Y,
+                  gamestate,
+                  world,
+                  open,
+                  hotspots,
+                  now);
+    stack.Draw(canvas, Tools, hotspots, area.X, area.Y + FixedHeight, now);
 }
 
 } // namespace Client

@@ -21,6 +21,7 @@
 #define __TRC_CLIENT_UI_SIDEBAR_WINDOW_STACK_HPP__
 
 #include "graphics/canvas.hpp"
+#include "ui/hotspots.hpp"
 #include "ui/sidebar/content_window.hpp"
 #include "ui/widgets.hpp"
 
@@ -36,22 +37,31 @@ namespace Client {
  * when a new window doesn't fit, the ones above it give way. */
 class WindowStack {
 public:
+    /* What pressing the close button of a window asks for. */
+    struct Closing {
+        Gesture What;
+        uint32_t Target = 0;
+    };
+
     explicit WindowStack(int height) : Height(height) {
     }
 
     /* Opens a window at the bottom the way the client does. If there isn't
      * room for it the windows above are made smaller, starting with the
      * lowest, and those that cannot shrink enough are closed. */
-    void Open(std::unique_ptr<ContentWindow> window);
+    void Open(std::unique_ptr<ContentWindow> window, const Closing &closing);
 
     /* Opens a window at the bottom if that takes nothing away from the
      * windows opened with `Open`: only others opened this way shrink for
      * it, and none is closed. Returns whether it was opened. */
-    bool OpenIfRoom(std::unique_ptr<ContentWindow> window);
+    bool OpenIfRoom(std::unique_ptr<ContentWindow> window,
+                    const Closing &closing);
 
-    /* Draws the column with its top-left corner at (x, y). */
+    /* Draws the column with its top-left corner at (x, y), noting where
+     * its windows can be closed. */
     void Draw(Canvas &canvas,
               Widgets &widgets,
+              Hotspots &hotspots,
               int x,
               int y,
               uint32_t now) const;
@@ -59,6 +69,7 @@ public:
 private:
     struct Entry {
         std::unique_ptr<ContentWindow> Window;
+        Closing Close;
         /* Height of the whole window. */
         int Height;
         /* Opened only because there was room. */
@@ -74,7 +85,9 @@ private:
     /* How much the optional windows could give up between them. */
     int Slack() const;
 
-    void Place(std::unique_ptr<ContentWindow> window, bool optional);
+    void Place(std::unique_ptr<ContentWindow> window,
+               const Closing &closing,
+               bool optional);
 
     void DrawFreeArea(Canvas &canvas,
                       const Skin &skin,

@@ -20,6 +20,7 @@ tibiarc-render [OPTION...] data_folder input_path output_prefix
 | `--step MS` | Time between frames (default 1000) |
 | `--fps RATE` | Frames per second, instead of `--step` |
 | `--count N` | Number of frames (default 1) |
+| `--click X Y` | Press a point of the window first, as a viewer could; may be repeated |
 | `--raw` | Write packed 24-bit RGB frames to standard output instead of PNG files |
 | `--discard` | Paint without writing; used by the tests |
 | `--input-version X.Y` | Game version, when the recording doesn't say |

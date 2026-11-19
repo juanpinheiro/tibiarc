@@ -23,6 +23,8 @@
 #include "graphics/canvas.hpp"
 #include "resources/fonts.hpp"
 #include "resources/skin.hpp"
+#include "ui/console/focus.hpp"
+#include "ui/hotspots.hpp"
 #include "world/console.hpp"
 
 #include <cstdint>
@@ -31,18 +33,26 @@ namespace trc {
 namespace Client {
 
 /* The console below the game window: channel tabs, the text of the channel
- * in front and the input line. A replay has no say in which channel that
- * is, so it is always the default one, scrolled to its newest messages. */
+ * in front and the input line. A recording doesn't tell which channel the
+ * player was looking at, so that is up to the viewer: the default one until
+ * a tab is pressed. The text stays scrolled to its newest messages. */
 class ConsolePanel {
 public:
     ConsolePanel(const Fonts &fonts, const Skin &skin)
         : Text(fonts), Pieces(skin) {
     }
 
+    /* Paints the console, noting what in it can be pressed. */
     void Draw(Canvas &canvas,
               const Rect &area,
               const ConsoleLog &log,
+              Hotspots &hotspots,
               uint32_t now);
+
+    /* Brings the channel at the given place among the tabs to the front. */
+    void SelectChannel(const ConsoleLog &log, size_t place) {
+        Focus.Select(log, place);
+    }
 
 private:
     void DrawBackground(Canvas &canvas, const Rect &area) const;
@@ -50,6 +60,7 @@ private:
 
     const Fonts &Text;
     const Skin &Pieces;
+    ConsoleFocus Focus;
 };
 
 } // namespace Client

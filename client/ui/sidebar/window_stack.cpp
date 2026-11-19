@@ -66,8 +66,10 @@ int WindowStack::Slack() const {
     return slack;
 }
 
-void WindowStack::Place(std::unique_ptr<ContentWindow> window, bool optional) {
-    Entry entry{std::move(window), 0, optional};
+void WindowStack::Place(std::unique_ptr<ContentWindow> window,
+                        const Closing &closing,
+                        bool optional) {
+    Entry entry{std::move(window), closing, 0, optional};
     int wanted = entry.Window->InitialHeight() + ContentWindow::BarsHeight;
     int free = FreeHeight();
 
@@ -105,18 +107,20 @@ void WindowStack::Place(std::unique_ptr<ContentWindow> window, bool optional) {
     }
 }
 
-void WindowStack::Open(std::unique_ptr<ContentWindow> window) {
-    Place(std::move(window), false);
+void WindowStack::Open(std::unique_ptr<ContentWindow> window,
+                       const Closing &closing) {
+    Place(std::move(window), closing, false);
 }
 
-bool WindowStack::OpenIfRoom(std::unique_ptr<ContentWindow> window) {
+bool WindowStack::OpenIfRoom(std::unique_ptr<ContentWindow> window,
+                             const Closing &closing) {
     const int minimum = window->MinimumHeight() + ContentWindow::BarsHeight;
 
     if (FreeHeight() + Slack() < minimum) {
         return false;
     }
 
-    Place(std::move(window), true);
+    Place(std::move(window), closing, true);
 
     return true;
 }
@@ -168,6 +172,7 @@ void WindowStack::DrawFreeArea(Canvas &canvas,
 
 void WindowStack::Draw(Canvas &canvas,
                        Widgets &widgets,
+                       Hotspots &hotspots,
                        int x,
                        int y,
                        uint32_t now) const {
@@ -181,6 +186,9 @@ void WindowStack::Draw(Canvas &canvas,
                            y + top,
                            entry.Height - ContentWindow::BarsHeight,
                            now);
+        hotspots.Add(ContentWindow::CloseButtonArea(x, y + top),
+                     entry.Close.What,
+                     entry.Close.Target);
         top += entry.Height;
     }
 

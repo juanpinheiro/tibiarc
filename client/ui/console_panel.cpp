@@ -118,8 +118,12 @@ void ConsolePanel::DrawButtons(Canvas &canvas,
 void ConsolePanel::Draw(Canvas &canvas,
                         const Rect &area,
                         const ConsoleLog &log,
+                        Hotspots &hotspots,
                         uint32_t now) {
     ClipScope clip(canvas, area);
+    const ConsoleChannel &front = Focus.Front(log);
+
+    Focus.Visit(front);
 
     DrawBackground(canvas, area);
 
@@ -132,6 +136,8 @@ void ConsolePanel::Draw(Canvas &canvas,
                               area.Width - TabStripX - TabStripRight,
                               Skin::Height(Bar)},
                          log,
+                         Focus,
+                         hotspots,
                          now);
 
     DrawButtons(canvas, area, moreTabs);
@@ -142,7 +148,7 @@ void ConsolePanel::Draw(Canvas &canvas,
                          area.Y + TextY,
                          area.Width - TextX - TextRight,
                          area.Height - TextY - TextBottom},
-                    log.Default());
+                    front);
     DrawInputLine(canvas,
                   Text,
                   Pieces,

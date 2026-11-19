@@ -3,8 +3,9 @@
  * This file is part of tibiarc. */
 
 /* Presents the engine's picture on a canvas that follows the size of its
- * container, one canvas pixel per CSS pixel as in the game client, and lets
- * the bar between game window and console be dragged. */
+ * container, one canvas pixel per CSS pixel as in the game client, passes
+ * clicks on to the interface, and lets the bar between game window and
+ * console be dragged. */
 
 const MINIMUM_WIDTH = 550;
 const MINIMUM_HEIGHT = 450;
@@ -25,6 +26,8 @@ export class Screen {
     canvas.addEventListener("pointermove", (event) => this.#move(event));
     canvas.addEventListener("pointerup", () => this.#release());
     canvas.addEventListener("pointercancel", () => this.#release());
+    canvas.addEventListener("click", (event) =>
+      this.engine.click(event.offsetX, event.offsetY));
   }
 
   static size(container) {
@@ -75,8 +78,12 @@ export class Screen {
       this.engine.consoleHeight = this.drag.height + this.drag.y - event.offsetY;
     }
 
+    const splitting = this.drag !== null || this.#overSplitter(event);
+
+    this.canvas.classList.toggle("splitting", splitting);
     this.canvas.classList.toggle(
-      "splitting", this.drag !== null || this.#overSplitter(event));
+      "pressable",
+      !splitting && this.engine.clickable(event.offsetX, event.offsetY));
   }
 
   #release() {
