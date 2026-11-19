@@ -42,13 +42,14 @@ static std::string WithSpeaker(const std::string &speaker,
     return speaker.substr(0, 29) + ": " + Trim(text);
 }
 
-void ConsoleChannel::Add(TalkKind kind, std::string text) {
+void ConsoleChannel::Add(uint32_t now, TalkKind kind, std::string text) {
     Messages.push_back(ConsoleMessage{kind, std::move(text)});
 
     if (Messages.size() > Limit) {
         Messages.pop_front();
     }
 
+    UnreadSince = now;
     Revision++;
 }
 
@@ -98,7 +99,8 @@ void ConsoleLog::CloseChannel(uint16_t id) {
     Changes += static_cast<uint32_t>(removed);
 }
 
-void ConsoleLog::AddSpeech(TalkKind kind,
+void ConsoleLog::AddSpeech(uint32_t now,
+                           TalkKind kind,
                            const std::string &speaker,
                            const std::string &text) {
     if (kind == TalkKind::Private) {
@@ -106,17 +108,19 @@ void ConsoleLog::AddSpeech(TalkKind kind,
         for (const auto &channel : Channels) {
             if (channel->Kind == ConsoleChannel::Type::Private &&
                 channel->Name == speaker) {
-                channel->Add(kind, WithSpeaker(speaker, text));
+                channel->Add(now, kind, WithSpeaker(speaker, text));
                 return;
             }
         }
     }
 
-    Default().Add(kind,
+    Default().Add(now,
+                  kind,
                   speaker.empty() ? Trim(text) : WithSpeaker(speaker, text));
 }
 
-void ConsoleLog::AddChannelSpeech(TalkKind kind,
+void ConsoleLog::AddChannelSpeech(uint32_t now,
+                                  TalkKind kind,
                                   uint16_t id,
                                   const std::string &speaker,
                                   const std::string &text) {
@@ -124,7 +128,8 @@ void ConsoleLog::AddChannelSpeech(TalkKind kind,
     for (const auto &channel : Channels) {
         if (channel->Kind == ConsoleChannel::Type::Public &&
             channel->Id == id) {
-            channel->Add(kind,
+            channel->Add(now,
+                         kind,
                          (kind == TalkKind::ChannelAnonymous || speaker.empty())
                                  ? Trim(text)
                                  : WithSpeaker(speaker, text));
@@ -133,15 +138,17 @@ void ConsoleLog::AddChannelSpeech(TalkKind kind,
     }
 }
 
-void ConsoleLog::AddServerMessage(TalkKind kind, const std::string &text) {
+void ConsoleLog::AddServerMessage(uint32_t now,
+                                  TalkKind kind,
+                                  const std::string &text) {
     const std::string trimmed = Trim(text);
 
-    Default().Add(kind, trimmed);
+    Default().Add(now, kind, trimmed);
 
     for (const auto &channel : Channels) {
         if (channel->Kind != ConsoleChannel::Type::Default &&
             channel->ServerMessages) {
-            channel->Add(kind, trimmed);
+            channel->Add(now, kind, trimmed);
         }
     }
 }

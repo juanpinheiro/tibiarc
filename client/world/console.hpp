@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <deque>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -49,11 +50,14 @@ struct ConsoleChannel {
     /* Whether server messages are copied into this channel. */
     bool ServerMessages = false;
 
-    std::deque<ConsoleMessage> Messages;
+    std::deque<ConsoleMessage> Messages = {};
+    /* When the newest message arrived. The tab of a channel that isn't in
+     * front draws attention to itself from then on. */
+    std::optional<uint32_t> UnreadSince = std::nullopt;
     /* Changes whenever a message is added or dropped. */
     uint32_t Revision = 0;
 
-    void Add(TalkKind kind, std::string text);
+    void Add(uint32_t now, TalkKind kind, std::string text);
 };
 
 class ConsoleLog {
@@ -66,6 +70,10 @@ public:
         return *Channels.front();
     }
 
+    const ConsoleChannel &Default() const {
+        return *Channels.front();
+    }
+
     const std::vector<std::unique_ptr<ConsoleChannel>> &All() const {
         return Channels;
     }
@@ -75,15 +83,19 @@ public:
     void CloseChannel(uint16_t id);
 
     /* Something said by someone, in the open or in private. */
-    void AddSpeech(TalkKind kind,
+    void AddSpeech(uint32_t now,
+                   TalkKind kind,
                    const std::string &speaker,
                    const std::string &text);
-    void AddChannelSpeech(TalkKind kind,
+    void AddChannelSpeech(uint32_t now,
+                          TalkKind kind,
                           uint16_t channel,
                           const std::string &speaker,
                           const std::string &text);
     /* A message from the server itself. */
-    void AddServerMessage(TalkKind kind, const std::string &text);
+    void AddServerMessage(uint32_t now,
+                          TalkKind kind,
+                          const std::string &text);
 
     /* Changes whenever channels are opened or closed. */
     uint32_t Revision() const {

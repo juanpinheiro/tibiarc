@@ -82,7 +82,7 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
 
         /* Creatures other than players aren't worth logging. */
         if (kind != TalkKind::MonsterSay && kind != TalkKind::MonsterYell) {
-            Console.AddSpeech(kind, event.AuthorName, event.Message);
+            Console.AddSpeech(now, kind, event.AuthorName, event.Message);
         }
         break;
     }
@@ -90,7 +90,8 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
         const auto &event =
                 static_cast<const Events::CreatureSpokeInChannel &>(base);
 
-        Console.AddChannelSpeech(ClassifyTalk(event.Mode),
+        Console.AddChannelSpeech(now,
+                                 ClassifyTalk(event.Mode),
                                  event.ChannelId,
                                  event.AuthorName,
                                  event.Message);
@@ -133,9 +134,9 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
 
         if (logged) {
             if (IsServerMessage(kind)) {
-                Console.AddServerMessage(kind, event.Message);
+                Console.AddServerMessage(now, kind, event.Message);
             } else {
-                Console.AddSpeech(kind, std::string(), event.Message);
+                Console.AddSpeech(now, kind, std::string(), event.Message);
             }
         }
         break;

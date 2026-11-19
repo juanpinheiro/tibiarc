@@ -30,8 +30,9 @@
 namespace trc {
 namespace Client {
 
-/* The console below the game window: channel tabs, the text of the active
- * channel and the input line. */
+/* The console below the game window: channel tabs, the text of the channel
+ * in front and the input line. A replay has no say in which channel that
+ * is, so it is always the default one, scrolled to its newest messages. */
 class ConsolePanel {
 public:
     ConsolePanel(const Fonts &fonts, const Skin &skin)
@@ -44,6 +45,9 @@ public:
               uint32_t now);
 
 private:
+    void DrawBackground(Canvas &canvas, const Rect &area) const;
+    void DrawButtons(Canvas &canvas, const Rect &area, bool moreTabs) const;
+
     const Fonts &Text;
     const Skin &Pieces;
 };
