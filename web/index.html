@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tibiarc player</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app" data-state="intake">
+    <section id="intake" aria-labelledby="intake-title">
+      <h1 id="intake-title">tibiarc player</h1>
+      <p class="lede">Watch old Tibia recordings the way the game client showed them.</p>
+
+      <label id="dropzone" tabindex="0">
+        <input id="file-input" type="file" multiple hidden>
+        <strong>Drop files here, or click to choose</strong>
+        <span>A recording, plus <code>Tibia.dat</code>, <code>Tibia.spr</code> and
+          <code>Tibia.pic</code> from the game version it was made with.</span>
+      </label>
+
+      <ul id="checklist" aria-label="Files needed">
+        <li data-slot="recording"><span class="mark"></span><span class="what">Recording</span><span class="detail"></span></li>
+        <li data-slot="dat"><span class="mark"></span><span class="what">Tibia.dat</span><span class="detail"></span></li>
+        <li data-slot="spr"><span class="mark"></span><span class="what">Tibia.spr</span><span class="detail"></span></li>
+        <li data-slot="pic"><span class="mark"></span><span class="what">Tibia.pic</span><span class="detail"></span></li>
+      </ul>
+
+      <div id="version-row" hidden>
+        <label for="version-input">This recording doesn't say which game version it was made
+          with. Enter it:</label>
+        <input id="version-input" type="text" inputmode="decimal" placeholder="7.70" size="6">
+      </div>
+
+      <p id="notice" role="status"></p>
+      <button id="open-button" type="button" disabled>Play</button>
+      <p class="fine">Nothing is uploaded: files are read by your browser only. Data files are
+        remembered on this device per game version, so next time the recording is enough.</p>
+    </section>
+
+    <section id="stage" aria-label="Player" hidden>
+      <div id="screen">
+        <canvas id="canvas" tabindex="0"></canvas>
+      </div>
+      <div id="controls">
+        <button id="play-button" type="button" aria-label="Pause"></button>
+        <output id="clock">0:00 / 0:00</output>
+        <input id="seek" type="range" min="0" max="0" value="0" step="100" aria-label="Position">
+        <label class="speed">Speed
+          <select id="speed">
+            <option value="0.25">¼×</option>
+            <option value="0.5">½×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+            <option value="8">8×</option>
+            <option value="16">16×</option>
+            <option value="64">64×</option>
+          </select>
+        </label>
+        <button id="fullscreen-button" type="button">Fullscreen</button>
+        <button id="eject-button" type="button">Open another</button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

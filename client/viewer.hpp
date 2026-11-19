@@ -57,6 +57,14 @@ public:
         return Areas;
     }
 
+    int Width() const {
+        return Window->Width;
+    }
+
+    int Height() const {
+        return Window->Height;
+    }
+
     /* Paints the window as of the session's current time. */
     const Canvas &Render();
 
