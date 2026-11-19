@@ -1,0 +1,102 @@
+/*
+ * Copyright 2011-2016 "Silver Squirrel Software Handelsbolag"
+ * Copyright 2023-2025 "John Högberg"
+ *
+ * This file is part of tibiarc.
+ *
+ * tibiarc is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * tibiarc is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with tibiarc. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "recording/recordings.hpp"
+#include "assets/versions.hpp"
+
+#include "common/utils.hpp"
+
+#include "protocol/parser.hpp"
+
+namespace trc {
+namespace Recordings {
+namespace TibiaTimeMachine {
+bool QueryTibiaVersion(const DataReader &file, VersionTriplet &triplet) {
+    auto tibiaVersion = file.Peek<uint16_t>();
+
+    triplet.Major = tibiaVersion / 100;
+    triplet.Minor = tibiaVersion % 100;
+    triplet.Preview = 0;
+
+    if (triplet.Major < 7 || triplet.Major > 12) {
+        throw InvalidDataError();
+    }
+
+    return true;
+}
+
+std::pair<std::unique_ptr<Recording>, bool> Read(const DataReader &file,
+                                                 const Version &version,
+                                                 Recovery recovery) {
+    DataReader reader = file;
+
+    /* Tibia version */
+    reader.SkipU16();
+
+    /* Byte-prefixed server name, non-zero if OT */
+    auto serverLength = reader.ReadU8();
+    reader.Skip(serverLength);
+    if (serverLength > 0) {
+        /* Server port */
+        reader.SkipU16();
+    }
+
+    auto recording = std::make_unique<Recording>();
+    bool partialReturn = false;
+
+    recording->Runtime = std::chrono::milliseconds(reader.ReadU32());
+
+    try {
+        Parser parser(version, recovery == Recovery::Repair);
+
+        std::chrono::milliseconds timestamp(0);
+
+        for (;;) {
+            auto packetReader = reader.Slice(reader.ReadU16());
+
+            recording->Frames.emplace_back(timestamp,
+                                           parser.Parse(packetReader));
+
+            if (reader.Remaining() == 0) {
+                break;
+            }
+
+            if (reader.ReadU8<0, 1>() == 0) {
+                /* Packet delay. */
+                timestamp += std::chrono::milliseconds(reader.ReadU16());
+            } else {
+                /* Fixed delay. */
+                timestamp += std::chrono::seconds(1);
+            }
+        }
+    } catch ([[maybe_unused]] const InvalidDataError &e) {
+        partialReturn = true;
+    }
+
+    if (recording->Frames.empty()) {
+        partialReturn = true;
+    }
+
+    return std::make_pair(std::move(recording), partialReturn);
+}
+
+} // namespace TibiaTimeMachine
+} // namespace Recordings
+} // namespace trc
