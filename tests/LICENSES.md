@@ -5,10 +5,10 @@ under what license.
 
 | Name | Author |
 | ------------- | -------------|
-| [`8.50/sample.yatc`](#sampleyatc) | Ivan Vučica |
-| [`8.40/sample.tmv2`](#sampletmv2) | mips |
+| [`samples/8.50/sample.yatc`](#sampleyatc) | Ivan Vučica |
+| [`samples/8.40/sample.tmv2`](#sampletmv2) | mips |
 
-### `8.50/sample.yatc`
+### `samples/8.50/sample.yatc`
 
 This is a renamed copy of `replay.binary` from the [YATC repository], and is
 copied with explicit permission from its author.
@@ -32,7 +32,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-### `8.40/sample.tmv2`
+### `samples/8.40/sample.tmv2`
 
 This is file is a copy of `sample.tmv` from the [TibiaMovie repository], and
 was copied under the assumption that it's covered under the same license as all

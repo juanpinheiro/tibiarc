@@ -171,7 +171,7 @@ std::vector<std::string> Process(
             }
 
             auto required = parameter->second.Arguments.size();
-            if (std::distance(it, arguments.cend()) < required) {
+            if (static_cast<size_t>(std::distance(it, arguments.cend())) < required) {
                 Error(path, "not enough arguments for --" + argument);
             }
 

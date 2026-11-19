@@ -36,6 +36,7 @@ using namespace trc;
 int main(int argc, char **argv) {
     int width = 800, height = 600;
     uint32_t start = 0, step = 1000, count = 1;
+    bool discard = false;
     VersionTriplet desired;
 
     auto paths = CLI::Process(
@@ -63,6 +64,12 @@ int main(int argc, char **argv) {
               {"number of frames to write",
                {"frames"},
                [&](const CLI::Range &args) { count = std::stoul(args[0]); }}},
+             {"discard",
+              {"paint the frames without writing them; for testing",
+               {},
+               [&]([[maybe_unused]] const CLI::Range &args) {
+                   discard = true;
+               }}},
              {"input-version",
               {"the Tibia version of the recording, in case it can't be "
                "detected",
@@ -121,8 +128,13 @@ int main(int argc, char **argv) {
             char suffix[32];
 
             viewer.Playback.Seek(start + index * step);
-            snprintf(suffix, sizeof(suffix), "%04u.png", index);
-            PNG::Write(viewer.Render(), paths[2] + suffix);
+
+            const Canvas &picture = viewer.Render();
+
+            if (!discard) {
+                snprintf(suffix, sizeof(suffix), "%04u.png", index);
+                PNG::Write(picture, paths[2] + suffix);
+            }
         }
     } catch (const ErrorBase &error) {
         std::cerr << "error: " << error.Description() << std::endl;

@@ -51,7 +51,7 @@ else()
   add_subdirectory(apps)
 
   include(CTest)
-  if(FALSE)
+  if(BUILD_TESTING)
     add_subdirectory(tests)
   endif()
 endif()
