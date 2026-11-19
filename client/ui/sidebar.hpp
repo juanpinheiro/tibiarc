@@ -25,6 +25,9 @@
 #include "graphics/canvas.hpp"
 #include "resources/fonts.hpp"
 #include "resources/skin.hpp"
+#include "ui/sidebar/button_bar.hpp"
+#include "ui/sidebar/window_stack.hpp"
+#include "ui/widgets.hpp"
 #include "world/world.hpp"
 
 #include <cstdint>
@@ -32,13 +35,15 @@
 namespace trc {
 namespace Client {
 
-/* The column along the right edge of the window: automap, health and mana,
- * inventory, and the stack of open windows (containers, skills, battle and
- * VIP lists). */
+/* The column along the right edge of the window. Its upper part is fixed:
+ * automap, health and mana, inventory and a row of buttons, in a frame of
+ * their own. Below it the open windows are stacked: those of the containers
+ * the player has opened, followed by the skills, battle and VIP lists as
+ * far as they are wanted and there is room for them. */
 class Sidebar {
 public:
     Sidebar(const Version &version, const Fonts &fonts, const Skin &skin)
-        : Data(version), Text(fonts), Pieces(skin) {
+        : Tools(version, fonts, skin) {
     }
 
     void Draw(Canvas &canvas,
@@ -48,9 +53,22 @@ public:
               uint32_t now);
 
 private:
-    const Version &Data;
-    const Fonts &Text;
-    const Skin &Pieces;
+    /* Opens the windows to show in `stack`, and tells which of those that
+     * have a button made it. */
+    static OpenWindows OpenContentWindows(WindowStack &stack,
+                                          const Gamestate &gamestate,
+                                          const World &world);
+
+    /* Draws the fixed part with its top-left corner at (x, y). */
+    void DrawFixedPart(Canvas &canvas,
+                       int x,
+                       int y,
+                       const Gamestate &gamestate,
+                       const World &world,
+                       const OpenWindows &open,
+                       uint32_t now);
+
+    Widgets Tools;
 };
 
 } // namespace Client

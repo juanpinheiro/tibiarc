@@ -107,6 +107,7 @@ void EntityType::ReadProperties(const Version &version, DataReader &reader) {
             types_SetOptionalProperty(Properties.Container);
             break;
         case TypeProperty::Automap:
+            types_SetOptionalProperty(Properties.Automap);
             types_ReadOptionalU16(reader, Properties.AutomapColor);
             break;
         case TypeProperty::Lenshelp:

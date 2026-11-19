@@ -23,24 +23,37 @@
 #include "game/gamestate.hpp"
 #include "protocol/events.hpp"
 
+#include "world/automap.hpp"
+#include "world/battle.hpp"
 #include "world/console.hpp"
 #include "world/options.hpp"
 #include "world/talk.hpp"
 
 #include <map>
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace trc {
 namespace Client {
 
 /* Everything the client remembers on top of the game state proper: what was
- * said, which channels are open, who is on the VIP list. It is fed the same
- * events as the game state, in the same order. */
+ * said, which channels are open, who is on the VIP list, where the player
+ * has been. It is fed the same events as the game state, in the same order. */
 class World {
 public:
     struct Buddy {
         std::string Name;
         bool Online = false;
+        /* When the buddy last logged in or out while on the list. */
+        std::optional<uint32_t> ChangeTick;
+    };
+
+    /* The window of an open container. It keeps the size it was given when
+     * it opened, whatever is put into the container later. */
+    struct OpenContainer {
+        uint32_t Id;
+        int InitialItems;
     };
 
     explicit World(const Options &options) : Preferences(options) {
@@ -56,11 +69,25 @@ public:
         Talk.Advance(now);
     }
 
+    const Options &Settings() const {
+        return Preferences;
+    }
+
     TalkBoard Talk;
     ConsoleLog Console;
     std::map<uint32_t, Buddy> Buddies;
+    Automap Chart;
+    BattleList Battle;
+    /* In the order the windows were opened. */
+    std::vector<OpenContainer> OpenContainers;
 
 private:
+    void OpenContainerWindow(uint32_t id, const Gamestate &gamestate);
+    void CloseContainerWindow(uint32_t id);
+
+    /* Notes that something changed on a field. */
+    void Disturb(const Position &position, const Gamestate &gamestate);
+
     const Options &Preferences;
 };
 

@@ -19,6 +19,8 @@
 
 #include "scene/overlay.hpp"
 
+#include "scene/health.hpp"
+
 #include <algorithm>
 #include <cstdlib>
 #include <string>
@@ -31,22 +33,6 @@ namespace {
 /* Keeps a value between two bounds, whichever of them is the larger. */
 void Bound(int &value, int a, int b) {
     value = std::clamp(value, std::min(a, b), std::max(a, b));
-}
-
-Pixel HealthColor(int percent) {
-    if (percent >= 0 && percent <= 3) {
-        return Pixel(0x60, 0, 0);
-    } else if (percent >= 4 && percent <= 9) {
-        return Pixel(0xC0, 0, 0);
-    } else if (percent >= 10 && percent <= 29) {
-        return Pixel(0xC0, 0x30, 0x30);
-    } else if (percent >= 30 && percent <= 59) {
-        return Pixel(0xC0, 0xC0, 0);
-    } else if (percent < 60 || percent > 94) {
-        return Pixel(0, 0xC0, 0);
-    }
-
-    return Pixel(0x60, 0xC0, 0x60);
 }
 
 struct Projection {

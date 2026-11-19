@@ -19,6 +19,8 @@
 
 #include "world/world.hpp"
 
+#include <algorithm>
+
 namespace trc {
 namespace Client {
 
@@ -26,6 +28,39 @@ void World::Reset() {
     Talk.Clear();
     Console.Clear();
     Buddies.clear();
+    Chart.Clear();
+    Battle.Clear();
+    OpenContainers.clear();
+}
+
+void World::OpenContainerWindow(uint32_t id, const Gamestate &gamestate) {
+    const auto window = std::find_if(
+            OpenContainers.begin(),
+            OpenContainers.end(),
+            [id](const OpenContainer &other) { return other.Id == id; });
+    const auto container = gamestate.Containers.find(id);
+
+    /* A container that takes the place of another reuses its window. */
+    if (window == OpenContainers.end() &&
+        container != gamestate.Containers.end()) {
+        OpenContainers.push_back(OpenContainer{
+                id,
+                static_cast<int>(container->second.Items.size())});
+    }
+}
+
+void World::CloseContainerWindow(uint32_t id) {
+    std::erase_if(OpenContainers, [id](const OpenContainer &window) {
+        return window.Id == id;
+    });
+}
+
+void World::Disturb(const Position &position, const Gamestate &gamestate) {
+    Chart.Survey(gamestate, position);
+
+    if (BattleList::Reaches(gamestate, position)) {
+        Battle.Refresh(gamestate);
+    }
 }
 
 void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
@@ -33,9 +68,55 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
 
     switch (base.Kind()) {
     case Events::Type::WorldInitialized:
-        /* Logging in anew starts from a clean slate. */
+        /* Logging in anew starts from a clean slate, save for the map. */
         Talk.Clear();
         Buddies.clear();
+        Battle.Clear();
+        OpenContainers.clear();
+        break;
+    case Events::Type::PlayerMoved:
+        Chart.Follow(gamestate);
+        Battle.Refresh(gamestate);
+        break;
+    case Events::Type::TileUpdated:
+        Disturb(static_cast<const Events::TileUpdated &>(base).Position,
+                gamestate);
+        break;
+    case Events::Type::TileObjectAdded:
+        Disturb(static_cast<const Events::TileObjectAdded &>(base).TilePosition,
+                gamestate);
+        break;
+    case Events::Type::TileObjectTransformed:
+        Disturb(static_cast<const Events::TileObjectTransformed &>(base)
+                        .TilePosition,
+                gamestate);
+        break;
+    case Events::Type::TileObjectRemoved:
+        Disturb(static_cast<const Events::TileObjectRemoved &>(base)
+                        .TilePosition,
+                gamestate);
+        break;
+    case Events::Type::CreatureMoved: {
+        const auto &event = static_cast<const Events::CreatureMoved &>(base);
+
+        Disturb(event.From, gamestate);
+        Disturb(event.To, gamestate);
+        break;
+    }
+    case Events::Type::CreatureSeen:
+    case Events::Type::CreatureRemoved:
+    case Events::Type::CreatureHealthUpdated:
+    case Events::Type::CreatureOutfitUpdated:
+        Battle.Refresh(gamestate);
+        break;
+    case Events::Type::ContainerOpened:
+        OpenContainerWindow(
+                static_cast<const Events::ContainerOpened &>(base).ContainerId,
+                gamestate);
+        break;
+    case Events::Type::ContainerClosed:
+        CloseContainerWindow(
+                static_cast<const Events::ContainerClosed &>(base).ContainerId);
         break;
     case Events::Type::CreatureSpoke:
     case Events::Type::CreatureSpokeOnMap: {
@@ -163,7 +244,7 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
     case Events::Type::VIPStatus: {
         const auto &event = static_cast<const Events::VIPStatus &>(base);
 
-        Buddies[event.Id] = Buddy{event.Name, event.Online};
+        Buddies[event.Id] = Buddy{event.Name, event.Online, std::nullopt};
         break;
     }
     case Events::Type::VIPOnlineChanged: {
@@ -172,6 +253,7 @@ void World::Apply(const Events::Base &base, const Gamestate &gamestate) {
 
         if (auto it = Buddies.find(event.Id); it != Buddies.end()) {
             it->second.Online = event.Online;
+            it->second.ChangeTick = now;
 
             if (event.Online) {
                 Talk.SetStatus(now, it->second.Name + " has logged in.");

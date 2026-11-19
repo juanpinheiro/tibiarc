@@ -469,7 +469,8 @@ struct PlayerIconsUpdated : public Base {
 };
 
 struct PlayerTacticsUpdated : public Base {
-    bool AttackMode = false;
+    /* 1 offensive, 2 balanced, 3 defensive. */
+    uint8_t AttackMode = 0;
     bool ChaseMode = false;
     bool SecureMode = false;
     bool PvPMode = false;

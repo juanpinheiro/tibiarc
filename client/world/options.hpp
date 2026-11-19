@@ -40,6 +40,12 @@ struct Options {
     /* Draws the map at its native size, cropped, instead of scaling it to
      * the game window. */
     bool NoStretching = false;
+
+    /* Which windows are open below the inventory, on top of those of the
+     * containers the player opens. */
+    bool ShowSkillsWindow = true;
+    bool ShowBattleWindow = true;
+    bool ShowVIPWindow = false;
 };
 
 } // namespace Client

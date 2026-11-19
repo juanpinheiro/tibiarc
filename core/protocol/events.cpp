@@ -333,6 +333,7 @@ void PlayerDataUpdated::Update(Gamestate &gamestate) const {
     stats.Fed = Fed;
     stats.Health = std::max<int16_t>(0, std::min(Health, MaxHealth));
     stats.Level = Level;
+    stats.LevelPercent = LevelPercent;
     stats.MagicLevel = MagicLevel;
     stats.MagicLevelBase = MagicLevelBase;
     stats.MagicLevelPercent = MagicLevelPercent;

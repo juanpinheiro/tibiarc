@@ -133,6 +133,7 @@ public:
 
         /* The remaining properties are parsed for completeness but are not
          * used for playback. */
+        bool Automap : 1;
         bool Blocking : 1;
         bool Container : 1;
         bool Corpse : 1;

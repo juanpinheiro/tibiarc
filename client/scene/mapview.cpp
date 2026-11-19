@@ -21,6 +21,7 @@
 
 #include "assets/versions.hpp"
 #include "scene/animation.hpp"
+#include "scene/parts.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -87,37 +88,6 @@ namespace {
 constexpr int MaxElevation = 24;
 constexpr uint32_t PlayerIdLimit = 0x40000000;
 constexpr int ShimmerEffect = 13;
-
-const EntityType::FrameGroup &DefaultGroup(const EntityType &type) {
-    return type.FrameGroups[std::to_underlying(FrameGroupIndex::Default)];
-}
-
-/* The sprite of one 32 by 32 part of a type; `x` and `y` count leftwards
- * and upwards from the bottom-right part. */
-const Sprite *PartSprite(const EntityType::FrameGroup &group,
-                         int x,
-                         int y,
-                         int layer,
-                         int patternX,
-                         int patternY,
-                         int patternZ,
-                         int phase) {
-    size_t index = phase % group.FrameCount;
-
-    index = index * group.ZDiv + (patternZ % group.ZDiv);
-    index = index * group.YDiv + (patternY % group.YDiv);
-    index = index * group.XDiv + (patternX % group.XDiv);
-    index = index * group.LayerCount + layer;
-    index = index * (group.SizeX * group.SizeY) + y * group.SizeX + x;
-
-    if (index >= group.Sprites.size()) {
-        return nullptr;
-    }
-
-    const Sprite *sprite = group.Sprites[index];
-
-    return (sprite != nullptr && sprite->Buffer != nullptr) ? sprite : nullptr;
-}
 
 /* The order in which a field's objects are drawn: ground, borders and
  * bottom objects as stacked, then everything else from the oldest to the
@@ -439,12 +409,7 @@ struct MapRenderer::Pass {
         }
 
         if (properties.Stackable) {
-            static constexpr int Thresholds[] = {2, 3, 4, 5, 10, 25, 50};
-            int picture = 0;
-
-            for (int threshold : Thresholds) {
-                picture += (object.ExtraByte >= threshold);
-            }
+            const int picture = StackPicture(object.ExtraByte);
 
             patternX = (picture % 4) % group.XDiv;
             patternY = (picture / 4) % group.YDiv;
