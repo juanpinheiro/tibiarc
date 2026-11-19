@@ -1,6 +1,7 @@
 /*
  * Copyright 2011-2016 "Silver Squirrel Software Handelsbolag"
  * Copyright 2023-2024 "John Högberg"
+ * Copyright 2026 "Juan Pinheiro"
  *
  * This file is part of tibiarc.
  *

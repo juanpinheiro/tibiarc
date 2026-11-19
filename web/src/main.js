@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright 2026 "Juan Pinheiro"
+ * This file is part of tibiarc. */
+
 import { Engine, OpenResult } from "./engine.js";
 import { Intake, formatVersion } from "./intake.js";
 import { remember } from "./library.js";

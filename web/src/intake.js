@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright 2026 "Juan Pinheiro"
+ * This file is part of tibiarc. */
+
 /* Collects what is needed to play a recording: the recording itself and the
  * three data files of its game version, the latter possibly from the
  * library of files seen before. */

@@ -2,7 +2,8 @@
 
 Plays back old Tibia recordings (7.11–8.62) as the 7.7 game client showed
 them. C++23 core and client compiled to WebAssembly, plain-JS web front end.
-See README.md for the folder map and build commands.
+Documentation lives in `docs/` (architecture, rendering, tools, testing);
+keep it current when behaviour, options or folders change.
 
 ## Commands
 

@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright 2026 "Juan Pinheiro"
+ * This file is part of tibiarc. */
+
 /* Presents the engine's picture on a canvas that follows the size of its
  * container, one canvas pixel per CSS pixel as in the game client, and lets
  * the bar between game window and console be dragged. */

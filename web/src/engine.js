@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright 2026 "Juan Pinheiro"
+ * This file is part of tibiarc. */
+
 /* The WebAssembly player behind a small object interface. One engine shows
  * one recording at a time. */
 

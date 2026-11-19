@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 "tibiarc contributors"
+ * Copyright 2026 "Juan Pinheiro"
  *
  * This file is part of tibiarc.
  *

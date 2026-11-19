@@ -1,5 +1,6 @@
 /*
  * Copyright 2025 "John Högberg"
+ * Copyright 2026 "Juan Pinheiro"
  *
  * This file is part of tibiarc.
  *
