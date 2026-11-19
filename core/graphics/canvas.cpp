@@ -52,7 +52,7 @@ Canvas::Canvas(int width, int height, int stride, uint8_t *buffer)
 
 void Canvas::Wipe() {
     for (int y = 0; y < Height; y++) {
-        memset(&GetPixel(0, y), 0, Width * sizeof(Pixel));
+        memset(static_cast<void *>(&GetPixel(0, y)), 0, Width * sizeof(Pixel));
     }
 }
 
