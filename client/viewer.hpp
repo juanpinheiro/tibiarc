@@ -71,7 +71,6 @@ public:
     Session Playback;
 
 private:
-    const Version &Data;
     Fonts Text;
     Skin Pieces;
     MapRenderer Renderer;

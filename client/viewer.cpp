@@ -31,7 +31,6 @@ Viewer::Viewer(const Version &version,
                int width,
                int height)
     : Playback(version, std::move(recording)),
-      Data(version),
       Text(version.Pictures),
       Pieces(version.Pictures.Get(PictureIndex::Icons)),
       Overlay(Text, Pieces),
